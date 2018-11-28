@@ -15,6 +15,7 @@ cursos_turmas.js
 header_gen
 header_gen_pdf
 capim.js
+<<<<<<< HEAD
 capim.js.gz
 capim.py
 .htaccess
@@ -25,4 +26,5 @@ dispatch.fcgi
 # Python
 
 .venv
+*.pyc
 __pycache__
