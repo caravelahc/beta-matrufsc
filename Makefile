@@ -3,29 +3,29 @@ include config.mak
 all: ods.py capim.py dispatch.$(CGI) capim.js index.html
 
 SRC:=json2.js \
-compat.js \
-persistence.js \
-dconsole.js \
-combinacoes.js \
-materias.js \
-display.js \
-combobox.js \
-database.js \
-state.js \
-versao.js \
-widgets.js \
-ui_sobre_popup.js \
-ui_avisos.js \
-ui_campus.js \
-ui_combinacoes.js \
-ui_horario.js \
-ui_logger.js \
-ui_materias.js \
-ui_planos.js \
-ui_saver.js \
-ui_turmas.js \
-ui_updates.js \
-main.js
+     compat.js \
+     persistence.js \
+     dconsole.js \
+     combinacoes.js \
+     materias.js \
+     display.js \
+     combobox.js \
+     database.js \
+     state.js \
+     versao.js \
+     widgets.js \
+     ui_sobre_popup.js \
+     ui_avisos.js \
+     ui_campus.js \
+     ui_combinacoes.js \
+     ui_horario.js \
+     ui_logger.js \
+     ui_materias.js \
+     ui_planos.js \
+     ui_saver.js \
+     ui_turmas.js \
+     ui_updates.js \
+     main.js
 
 SRC:=$(addprefix js/,$(SRC))
 
@@ -33,7 +33,7 @@ SRC:=$(addprefix js/,$(SRC))
 	gzip --best --no-name -c $< > $@
 
 ifeq ($(RELEASE),1)
-sed_RELEASE=-e "s/if(0)/if(1)/"
+	sed_RELEASE=-e "s/if(0)/if(1)/"
 endif
 
 ods.py: py/ods.py
@@ -49,7 +49,6 @@ index.html: html/capim.html html/sobre.html
 	sed -e "/include_sobre/r html/sobre.html" -e "/include_sobre/d" ${sed_RELEASE} html/capim.html | tee $@ > /dev/null
 
 capim.js: $(SRC)
-#	closure --compilation_level=ADVANCED_OPTIMIZATIONS $(addprefix --js=,$(SRC)) --js_output_file=$@
 ifeq ($(RELEASE),1)
 	closure --compilation_level=SIMPLE_OPTIMIZATIONS $(addprefix --js=,$(SRC)) --js_output_file=$@
 else

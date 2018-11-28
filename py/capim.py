@@ -9,17 +9,18 @@ import os
 
 import ods
 
-arquivos = { 'index.html'   : { 'content_type': 'text/html'              },
-             'capim.js'     : { 'content_type': 'application/javascript' },
-             'capim.css'    : { 'content_type': 'text/css'               },
-             '20121.json'   : { 'content_type': 'application/json'       },
-             '20122.json'   : { 'content_type': 'application/json'       },
-             '20131.json'   : { 'content_type': 'application/json'       },
-             '20132.json'   : { 'content_type': 'application/json'       },
-             '20141.json'   : { 'content_type': 'application/json'       },
-           }
+arquivos = {'index.html': {'content_type': 'text/html'},
+            'capim.js': {'content_type': 'application/javascript'},
+            'capim.css': {'content_type': 'text/css'},
+            '201a1.json': {'content_type': 'application/json'},
+            '20122.json': {'content_type': 'application/json'},
+            '20131.json': {'content_type': 'application/json'},
+            '20132.json': {'content_type': 'application/json'},
+            '20141.json': {'content_type': 'application/json'},
+            }
 
 dados_prefix = '$BASE_PATH/dados3/'
+
 
 # based on urlparse.py:parse_qs
 def get_q(qs):
@@ -33,14 +34,13 @@ def get_q(qs):
         if nv[0] == 'q':
             return nv[1]
     raise IOError
+
+
 def encoded_fname(environ):
     return get_q(environ['QUERY_STRING']).encode('hex') + '.json'
 
+
 def run(environ, start_response):
-
-#    start_response('404 Not Found', [('Content-Type', 'text/html; charset=UTF-8')])
-#    return [str(environ)]
-
     path = environ['PATH_INFO'][1:].split('/')
     use_gzip = False
     try:
@@ -56,14 +56,14 @@ def run(environ, start_response):
     if path0 in arquivos:
         arquivo = arquivos[path0]
 
-        if not 'uncompressed_length' in arquivo:
+        if 'uncompressed_length' not in arquivo:
             fname = path0
             fp = open(fname, 'rb')
-            arquivo['uncompressed_data'  ] = fp.read()
+            arquivo['uncompressed_data'] = fp.read()
             fp.close()
             arquivo['uncompressed_length'] = str(os.path.getsize(fname))
-            arquivo['last_modified_time' ] = os.path.getmtime(fname)
-            arquivo['last_modified_str'  ] = formatdate(arquivo['last_modified_time'], False, True)
+            arquivo['last_modified_time'] = os.path.getmtime(fname)
+            arquivo['last_modified_str'] = formatdate(arquivo['last_modified_time'], False, True)
 
         try:
             since_time = calendar.timegm(parsedate(environ['HTTP_IF_MODIFIED_SINCE']))
@@ -78,10 +78,10 @@ def run(environ, start_response):
         content_encoding = None
 
         if use_gzip:
-            if not 'compressed_length' in arquivo:
+            if 'compressed_length' not in arquivo:
                 fname = path0 + '.gz'
                 fp = open(fname, 'rb')
-                arquivo['compressed_data'  ] = fp.read()
+                arquivo['compressed_data'] = fp.read()
                 fp.close()
                 arquivo['compressed_length'] = str(os.path.getsize(fname))
 
@@ -90,11 +90,10 @@ def run(environ, start_response):
             content_encoding = 'gzip'
 
         headers = [('Content-Type', arquivo['content_type']),
-#                  ('Expires', '-1'),
                    ('Last-Modified', arquivo['last_modified_str']),
                    ('X-Uncompressed-Content-Length', arquivo['uncompressed_length']),
                    ('Content-Length', content_length),
-                  ]
+                   ]
 
         if content_encoding is not None:
             headers.append(('Content-Encoding', content_encoding))

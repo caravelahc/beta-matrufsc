@@ -5,29 +5,35 @@ function Combobox(input, suggestions, ui_logger, database)
 {
     function select_item(item)
     {
-        if (!self.array.length)
+        if (!self.array.length) {
             return;
-        if (self.selected_item != -1)
+        }
+        if (self.selected_item != -1) {
             self.array[self.selected_item].style.backgroundColor = self.color_0;
-        if        (item >= self.array.length) {
+        }
+        if (item >= self.array.length) {
             self.selected_item = 0;
-        } else if (item <             0) {
+        } else if (item < 0) {
             self.selected_item = self.array.length - 1;
         } else {
             self.selected_item = item;
         }
+
         var s_top    = self.suggestions.scrollTop;
         var s_height = self.suggestions.clientHeight;
         var i_top    = self.array[self.selected_item].offsetTop;
         var i_height = self.array[self.selected_item].clientHeight;
-        if        ( s_top             > i_top) {
+
+        if ( s_top > i_top) {
             self.suggestions.scrollTop = i_top;
         } else if ((s_top + s_height) < (i_top + i_height)) {
             self.suggestions.scrollTop = i_top + i_height - s_height;
         }
+
         self.array[self.selected_item].style.backgroundColor = self.color_1;
         list_show();
     }
+
     function deselect_item()
     {
         if (self.selected_item != -1) {
@@ -39,7 +45,7 @@ function Combobox(input, suggestions, ui_logger, database)
     var self = this;
     self.color_0 = "white";
     self.color_1 = "#eeeeee";
-    self.input       = document.getElementById(input);
+    self.input = document.getElementById(input);
     self.input.className = "combobox_input";
     self.suggestions = document.getElementById(suggestions);
     self.suggestions.className = "combobox_suggestions";
@@ -66,11 +72,14 @@ function Combobox(input, suggestions, ui_logger, database)
         };
         list_hide();
     }
+
     function list_add_item(str, title) {
         var li = document.createElement("div");
         li.style.cursor = "pointer";
-        if (title)
+
+        if (title) {
             li.title = title;
+        }
 
         li.innerHTML   = str;
         li.onmouseover = function() { select_item(this.index); };
@@ -99,8 +108,10 @@ function Combobox(input, suggestions, ui_logger, database)
     };
     function list_add_items(items) {
         var first = self.array.length;
-//        items.forEach(function(item){var str = item.codigo + " " + item.score + " " + item.nome; list_add_item(str);});
-        items.forEach(function(item){var str = item.codigo + " " + item.nome; list_add_item(str);});
+        items.forEach(function(item){
+            var str = item.codigo + " " + item.nome;
+            list_add_item(str);
+        });
         if (items.length == 10) {
             self.more = list_add_item("Buscar mais...");
             self.array[self.more].style.fontSize = "13px";

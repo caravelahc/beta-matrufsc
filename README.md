@@ -1,5 +1,6 @@
 Introdução
 ==========
+
 O **CAPIM** foi escrito para substituir um serviço similar que existia para os
 estudantes da UFSC, o **GRAMA** (GRAde de MAtrícula), que foi escrito por um
 estudante de Engenharia de Produção e tinha o apoio da universidade, pelo site
@@ -188,7 +189,7 @@ configure, passando as seguintes opções:
 - --release               habilita otimização, facebook e google analytics
 - --base-path=&lt;caminho&gt;   caminho da pasta principal do capim no servidor onde
                           serão guardados os horários dos usuários e os logs de
-                          erro, por exemplo: /home/user/matrufsc 
+                          erro, por exemplo: /home/user/matrufsc
     										  (não deixe estes arquivos expostos pelo servidor)
 - --subdir=&lt;caminho&gt;      subdiretório em que o capim se encontra no site, por
                           exemplo: example.com/&lt;caminho&gt;
