@@ -25,3 +25,4 @@ dispatch.fcgi
 # Python
 
 .venv
+__pycache__
