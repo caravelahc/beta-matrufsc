@@ -19,7 +19,7 @@ arquivos = {'index.html': {'content_type': 'text/html'},
             '20141.json': {'content_type': 'application/json'},
             }
 
-dados_prefix = '$BASE_PATH/dados3/'
+dados_prefix = '$BASE_PATH/data/'
 
 
 # based on urlparse.py:parse_qs
