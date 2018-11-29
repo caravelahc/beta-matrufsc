@@ -14,6 +14,23 @@ Plano.prototype.cleanup = function() {
     this.materias    = new Materias();
 }
 
+
+function check_subject_db(database, subject_state) {
+    let semester = subject_state.semestre;
+
+    let semester_db = database.db['data/' + semester];
+    if (!semester_db) {
+        return null;
+    }
+
+    let campus_db = semester_db[subject_state.campus];
+    if (!campus_db) {
+        return null;
+    }
+
+    return campus_db[subject_state.codigo];
+}
+
 /**
  * @constructor
  */
@@ -281,10 +298,8 @@ function State()
             var m_issues = [];
             m_issues.materia = materias[i];
             var state_materia = materias[i];
-            var db_materia;
-            if (database.db[state_materia.semestre] &&
-                database.db[state_materia.semestre][state_materia.campus])
-                db_materia = database.db[state_materia.semestre][state_materia.campus][state_materia.codigo];
+
+            var db_materia = check_subject_db(database, state_materia);
             if (!db_materia) {
                 if (/^[A-Z]{3}[0-9]{4}$/.test(state_materia.codigo) &&
                    !/^XXX[0-9]{4}$/.test(state_materia.codigo)) {
