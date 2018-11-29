@@ -3,6 +3,7 @@ include config.mak
 all: ods.py capim.py dispatch.$(CGI) capim.js index.html
 
 SRC:=json2.js \
+	 utils.js \
      compat.js \
      persistence.js \
      dconsole.js \

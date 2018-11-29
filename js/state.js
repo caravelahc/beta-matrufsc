@@ -22,15 +22,11 @@ function State()
     var self = this;
 
     self.reset = function() {
-        self.planos = [];
-        self.planos.push(new Plano(0));
-        self.planos.push(new Plano(1));
-        self.planos.push(new Plano(2));
-        self.planos.push(new Plano(3));
-        self.index  = 0;
-        self.plano  = self.planos[self.index];
+        self.planos = Array.from(range(0, 4, 1, i => new Plano(i)));
+        self.index = 0;
+        self.plano = self.planos[self.index];
         self.campus = "FLO";
-        self.semestre = "20141";
+        self.semestre = semester_as_str(...next_semester(), '');
     }
     self.reset();
 
@@ -173,7 +169,10 @@ function State()
                 var sala = turma.aulas[i].sala;
                 do {
                     var hor1 = turma.aulas[i++].hora;
-                } while (i < turma.aulas.length && turma.aulas[i].dia == dia && turma.aulas[i].sala == sala && turma.aulas[i].hora == (hor1+1));
+                } while (i < turma.aulas.length &&
+                         turma.aulas[i].dia == dia &&
+                         turma.aulas[i].sala == sala &&
+                         turma.aulas[i].hora == (hor1+1));
                 var dia_str = "" + (17 + dia);
                 hor0 = Horas[hor0]
                 hor1 = parseInt(Horas[hor1]) + 50;
@@ -238,15 +237,25 @@ function State()
 
         for (var p = 0; p < state_to_load.planos.length; p++) {
             var plano = self.new_plano(state_to_load.planos[p], p);
-            if (plano == -1)
+
+            if (plano == -1) {
                 return -1;
+            }
+
             self.planos.push(plano);
         }
-        if (!self.planos[0])
+
+        if (!self.planos[0]) {
             self.planos[0] = new Plano(1);
+        }
+
         var plano_to_load = state_to_load.plano;
-        if (plano_to_load < 0 || plano_to_load > self.planos.length || !plano_to_load)
+        if (plano_to_load < 0 ||
+            plano_to_load > self.planos.length ||
+            !plano_to_load)
+        {
             plano_to_load = 0;
+        }
         self.index = plano_to_load;
         self.plano = self.planos[plano_to_load];
         return 0;
@@ -254,10 +263,13 @@ function State()
 
     self.set_plano = function(plano) {
         var i = 0;
-        if (plano)
-            for (; i < self.planos.length; i++)
-                if (self.planos[i] == plano)
+        if (plano) {
+            for (; i < self.planos.length; i++) {
+                if (self.planos[i] == plano) {
                     break;
+                }
+            }
+        }
         self.index = i;
         self.plano = self.planos[self.index];
     };
@@ -371,12 +383,14 @@ function State()
                 }(state_materia, db_turma);
                 m_issues.push(issue);
             }
-            if (m_issues[0])
+            if (m_issues[0]) {
                 issues.push(m_issues);
+            }
         }
-        if (issues[0])
+        if (issues[0]) {
             callback_yes(issues);
-        else
+        } else {
             callback_no();
+        }
     };
 }
