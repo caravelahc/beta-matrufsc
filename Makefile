@@ -3,7 +3,7 @@ include config.mak
 all: ods.py capim.py dispatch.$(CGI) capim.js index.html
 
 SRC:=json2.js \
-	 utils.js \
+     utils.js \
      compat.js \
      persistence.js \
      dconsole.js \
@@ -28,10 +28,14 @@ SRC:=json2.js \
      ui_updates.js \
      main.js
 
+
+.PHONY: install
+
+
 SRC:=$(addprefix js/,$(SRC))
 
 %.gz: %
-	gzip --best --no-name -c $< > $@
+	gzip --best --no-name -c frontend/$< > frontend/$@
 
 ifeq ($(RELEASE),1)
 	sed_RELEASE=-e "s/if(0)/if(1)/"
@@ -58,7 +62,7 @@ endif
 
 clean::
 	rm -rf capim.js index.html
-	rm -rf install
+	rm -rf ${SITE_PATH}
 	rm -f $(addsuffix /*~,. c db html js py) .htaccess~ .gitignore~
 	rm -f capim.py ods.py dispatch.$(CGI)
 	rm -f capim.css.gz capim.js.gz index.html.gz
@@ -68,10 +72,20 @@ distclean: clean
 	rm -f config.mak
 
 install-gz:: install capim.css.gz capim.js.gz index.html.gz
-	cp capim.css.gz capim.js.gz index.html.gz install/
+	@echo "Installing GZ files..."
+ifndef SITE_PATH
+	@echo "Please, set SITE_PATH variable to output directory."
+	@exit 1
+endif
 
 install:: all
-	mkdir -p install
-	cp capim.css capim.js dispatch.$(CGI) capim.py ods.py index.html install/
-	chmod 755 install/dispatch.$(CGI) install/capim.py install/ods.py
-	cp .htaccess install/
+	@echo "Installing..."
+ifndef SITE_PATH
+	@echo "Please, set SITE_PATH variable to output directory."
+	@exit 1
+endif
+	mkdir -p ${SITE_PATH}
+	cp capim.css ${SITE_PATH}/
+	mv capim.js dispatch.$(CGI) capim.py ods.py index.html ${SITE_PATH}/
+	chmod 755 ${SITE_PATH}/dispatch.$(CGI) ${SITE_PATH}/capim.py ${SITE_PATH}/ods.py
+	cp .htaccess ${SITE_PATH}/

@@ -795,7 +795,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
                 "Nós já estamos em " + year + '-' + semester + "!"
             );
         }
-        semestre = 'data/' + semestre;
+        semestre = DB_BASE_PATH + '/' + semestre;
         var ret = database.set_db(semestre, campus);
         if (ret == -1)
             load_db(semestre, campus, callback);

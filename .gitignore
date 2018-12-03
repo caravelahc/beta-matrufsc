@@ -1,8 +1,9 @@
 #-------------------------------------------------------------------------------
 # Capim-specific
 
+backend
 data
-_site
+frontend
 
 install
 ods.py
@@ -15,7 +16,6 @@ cursos_turmas.js
 header_gen
 header_gen_pdf
 capim.js
-<<<<<<< HEAD
 capim.js.gz
 capim.py
 .htaccess

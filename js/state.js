@@ -18,7 +18,7 @@ Plano.prototype.cleanup = function() {
 function check_subject_db(database, subject_state) {
     let semester = subject_state.semestre;
 
-    let semester_db = database.db['data/' + semester];
+    let semester_db = database.db[DB_BASE_PATH + '/' + semester];
     if (!semester_db) {
         return null;
     }

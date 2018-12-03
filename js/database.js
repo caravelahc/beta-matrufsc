@@ -1,3 +1,4 @@
+DB_BASE_PATH = 'data/'
 /**
  * @constructor
  */
@@ -15,11 +16,11 @@ Database.prototype.get_date = function(semestre) {
     return this.db[semestre]["DATA"];
 }
 Database.prototype.set_db = function(semestre, campus) {
-    if (this.db[semestre] && this.db[semestre][campus])
+    if (this.db[semestre] && this.db[semestre][campus]) {
         this.cur_db = this.db[semestre][campus];
-    else
-        return -1;
-    return 0;
+	return 0;
+    }
+    return -1;
 }
 Database.prototype.add = function(semestre, array) {
     var self = this;
@@ -118,15 +119,17 @@ Database.prototype.fetch = function(string, page) {
         var diff = b.score - a.score;
         if (!diff) {
             if (a.score < 10 && b.score < 10) {
-                if      (b.codigo < a.codigo)
+                if (b.codigo < a.codigo) {
                     diff =  1;
-                else if (a.codigo < b.codigo)
+		} else if (a.codigo < b.codigo) {
                     diff = -1;
+	        }
             } else {
-                if      (b.nome_ascii < a.nome_ascii)
+                if (b.nome_ascii < a.nome_ascii) {
                     diff =  1;
-                else if (a.nome_ascii < b.nome_ascii)
+		} else if (a.nome_ascii < b.nome_ascii) {
                     diff = -1;
+		}
             }
         }
         return diff;
