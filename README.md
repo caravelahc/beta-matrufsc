@@ -1,3 +1,10 @@
+CAPIM
+=====
+
+_**OBS: Este README está bastante desatualizado. Por exemplo, os arquivos JSON não
+vêm mais do repositório do Ramiro, mas sim via um script específico para isso
+no servidor.**_
+
 Introdução
 ==========
 
