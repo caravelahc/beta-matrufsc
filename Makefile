@@ -1,5 +1,7 @@
 include config.mak
 
+default: install
+
 all: ods.py capim.py dispatch.$(CGI) capim.js index.html
 
 SRC:=json2.js \
@@ -85,7 +87,7 @@ ifndef SITE_PATH
 	@exit 1
 endif
 	mkdir -p ${SITE_PATH}
-	cp capim.css ${SITE_PATH}/
+	cp favicon.ico capim.css ${SITE_PATH}/
 	mv capim.js dispatch.$(CGI) capim.py ods.py index.html ${SITE_PATH}/
 	chmod 755 ${SITE_PATH}/dispatch.$(CGI) ${SITE_PATH}/capim.py ${SITE_PATH}/ods.py
 	cp .htaccess ${SITE_PATH}/

@@ -88,18 +88,18 @@ function State()
         return state_plano;
     }
 
-    self.save = function() {
-        var state_to_return = new Object();
-        state_to_return.versao = 5;
-        state_to_return.campus = self.campus;
-        state_to_return.semestre = self.semestre;
-        state_to_return.planos = new Array();
-        state_to_return.plano  = self.index;
-        for (var p = 0; p < self.planos.length; p++) {
-            var state_plano = self.copy_plano(self.planos[p]);
-            state_to_return.planos.push(state_plano);
+    self.to_json = function() {
+        let data = new Object();
+        data.versao = 5;
+        data.campus = self.campus;
+        data.semestre = self.semestre;
+        data.planos = new Array();
+        data.plano  = self.index;
+        for (let p = 0; p < self.planos.length; p++) {
+            let state_plano = self.copy_plano(self.planos[p]);
+            data.planos.push(state_plano);
         }
-        return JSON.stringify(state_to_return);
+        return JSON.stringify(data);
     };
 
     var cores = document.createElement("textarea");

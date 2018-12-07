@@ -356,7 +356,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
         ui_logger.reset();
         current = null;
         mudancas = state.plano.combinacoes.get_current();
-        persistence.write_state(state.save());
+        persistence.write_state(state.to_json());
     }
     self.editando = null;
     function edit_start(turma) {
@@ -424,16 +424,20 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
             for (var hora = 0; hora < 14; hora++)
                 onout(dia, hora);
     }
-    ui_turmas.cb_edit_turma  = function(turma) {
+    ui_turmas.cb_edit_turma = function(turma) {
         edit_start(turma);
     };
-    ui_turmas.cb_onmouseover = function(turma) { display.over(state.plano.combinacoes.get_current(), turma); };
-    ui_turmas.cb_onmouseout  = function(turma) { display.out(state.plano.combinacoes.get_current(), turma); };
-    ui_turmas.cb_changed     = function(turma, checked) {
+    ui_turmas.cb_onmouseover = function(turma) {
+        display.over(state.plano.combinacoes.get_current(), turma);
+    };
+    ui_turmas.cb_onmouseout = function(turma) {
+        display.out(state.plano.combinacoes.get_current(), turma);
+    };
+    ui_turmas.cb_changed = function(turma, checked) {
         turma.selected = checked ? 1 : 0;
         turma.materia.selected = 1;
     };
-    ui_turmas.cb_updated     = function(materia) {
+    ui_turmas.cb_updated = function(materia) {
         var turma = display.get_selected();
         update_all();
         if (materia)
@@ -441,11 +445,12 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
         if (turma)
             display.over(state.plano.combinacoes.get_current(), turma);
     };
-    ui_turmas.cb_ok          = function() {
+
+    ui_turmas.cb_ok = function() {
         ui_grayout.hide();
         update_all();
     };
-    ui_turmas.cb_cancel      = function() {
+    ui_turmas.cb_cancel = function() {
         ui_grayout.hide();
         clear_overlay();
         ui_horario.set_toggle(null);
@@ -455,22 +460,24 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
     };
     /* UI_saver */
     ui_saver.cb_ods = function() {
-        var identificador = ui_saver.input.value;
-        if (!identificador)
-            identificador = "matrufsc";
-        ui_saver.form.action = "ods.cgi?q=" + encodeURIComponent(identificador + ".ods");
+        var identifier = ui_saver.input.value;
+        if (!identifier) {
+            identifier = "matrufsc";
+        }
+        ui_saver.form.action = "ods.cgi?q=" + encodeURIComponent(identifier + ".ods");
         ui_saver.form_input.value = JSON.stringify(state.preview());
         ui_saver.form.submit();
     };
     ui_saver.cb_download = function(ext) {
-        var identificador = ui_saver.input.value;
-        if (!identificador)
-            identificador = "matrufsc";
-        ui_saver.form.action = "ping.cgi?q=" + encodeURIComponent(identificador + ext);
+        var identifier = ui_saver.input.value;
+        if (!identifier) {
+            identifier = "matrufsc";
+        }
+        ui_saver.form.action = "ping.cgi?q=" + encodeURIComponent(identifier + ext);
         if (ext == ".ics") {
             ui_saver.form_input.value = state.ics();
         } else {
-            ui_saver.form_input.value = state.save();
+            ui_saver.form_input.value = state.to_json();
         }
         ui_saver.form.submit();
     };
@@ -534,38 +541,67 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
         ui_saver.reset();
         ui_planos.startup(state);
     };
-    ui_saver.cb_save = function(identificador) {
-        self.save(identificador);
+    ui_saver.cb_save = function(identifier) {
+        self.save(identifier);
     };
-    ui_saver.cb_load = function(identificador, cb_error) {
-        if (!identificador || identificador == "") {
-            ui_logger.set_text("identificador invalido", "lightcoral");
+    ui_saver.cb_load = function(identifier, cb_error) {
+        if (!identifier || identifier == "") {
+            ui_logger.set_text("identifier invalido", "lightcoral");
             return;
         }
-        load_request = new XMLHttpRequest();
-        load_request.loadstr = identificador;
-        load_request.onreadystatechange = function() {
-            if (this.readyState == 4) {
-                if (this.status == 200 && this.responseText != "") {
-                    try {
-                        var state_to_load = JSON.parse(this.responseText);
-                    } catch (e) {
-                    }
-                }
-                if (!state_to_load) {
-                    ui_logger.set_text("erro ao abrir horário para '" + this.loadstr + "' ", "lightcoral");
-                    if (cb_error)
-                        cb_error();
-                } else {
-                    self.load(state_to_load, identificador);
-                    ui_logger.set_text("horário para '" + this.loadstr + "' foi carregado", "lightgreen");
-                }
+
+        let url = 'matrufsc/load/' + identifier;
+
+        const debug = !false;
+        if (debug) {
+            url = 'http://localhost:5000/' + url;
+        }
+
+        let request = new Request(
+            url,
+            {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+
+        fail = function() {
+            ui_logger.set_text(
+                'erro ao abrir horário para "' + identifier + '" ',
+                'lightcoral'
+            );
+
+            if (cb_error) {
+                cb_error();
             }
         };
-        load_request.open("GET", "load2.cgi?q=" + encodeURIComponent(identificador), true);
-        load_request.send(null);
-        _gaq.push(['_trackEvent', 'state', 'load', identificador])
-        ui_logger.waiting("carregando horário para '" + identificador + "'");
+
+        fetch(request)
+            .then(function(response) {
+                if (!response.ok) {
+                    fail();
+                }
+                response.text().then(function (text) {
+                    text = text.replace(/'/g, '"');
+                    try {
+                        var state_to_load = JSON.parse(text);
+                    } catch (e) {
+                        fail();
+                        throw e;
+                    }
+                    self.load(state_to_load, identifier);
+                    ui_logger.set_text(
+                        'horário para "' + identifier + '" foi carregado',
+                        'lightgreen'
+                    );
+                });
+            });
+
+        _gaq.push(['_trackEvent', 'state', 'load', identifier])
+        ui_logger.waiting('carregando horário para "' + identifier + '"');
     }
     /* UI_horario */
     ui_horario.cb_select = function() {
@@ -624,45 +660,68 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
         self.issues();
     };
     /* Save/Load */
-    self.save = function(identificador) {
-        if (!identificador || identificador == "") {
-            ui_logger.set_text("identificador invalido", "lightcoral");
+    self.save = function(identifier) {
+        if (!identifier || identifier == "") {
+            ui_logger.set_text("identifier invalido", "lightcoral");
             return;
         }
-        var ret = state.save();
 
-        persistence.write_state(ret);
+        let url = 'matrufsc/store/' + identifier;
+        let data = state.to_json();
+        persistence.write_state(data);
 
-        save_request = new XMLHttpRequest();
-        save_request.savestr = identificador;
-        save_request.onreadystatechange = function() {
-            if (this.readyState == 4) {
-                if ((this.status != 200) || this.responseText != "OK") {
-                    ui_logger.set_text("erro ao salvar horário para '" + this.savestr + "'", "lightcoral");
-                } else {
-                    ui_logger.set_text("horário para '" + this.savestr + "' foi salvo", "lightgreen");
-                    persistence.write_id(this.savestr);
-                    mudancas = false;
-                }
+        const debug = !false;
+        if (debug) {
+            url = 'http://localhost:5000/' + url;
+            data = {"versao":5,"campus":"FLO","semestre":"20191","planos":[{"combinacao":1,"materias":[{"codigo":"INE5429","nome":"Segurança em Computação *CIÊNCIAS DA COMPUTAÇÃO","cor":"lightcoral","campus":"FLO","semestre":"20191","turmas":[{"nome":"07208","horas_aula":72,"vagas_ofertadas":30,"vagas_ocupadas":0,"alunos_especiais":0,"saldo_vagas":30,"pedidos_sem_vaga":0,"professores":["Jean Everson Martina","Ricardo Felipe Custódio"],"horarios":["3.1620-1 / CTC-INE101","3.1710-1 / CTC-INE101","5.1620-1 / CTC-CTC101","5.1710-1 / CTC-CTC101"],"selected":1}],"agrupar":1,"selected":1},{"codigo":"INE5420","nome":"Computação Gráfica *CIÊNCIAS DA COMPUTAÇÃO","cor":"lightcyan","campus":"FLO","semestre":"20191","turmas":[{"nome":"05208","horas_aula":72,"vagas_ofertadas":33,"vagas_ocupadas":0,"alunos_especiais":0,"saldo_vagas":33,"pedidos_sem_vaga":0,"professores":["Aldo Von Wangenheim"],"horarios":["3.0820-1 / CTC-LABINF","3.0910-1 / CTC-LABINF","5.0820-1 / CTC-LABINF","5.0910-1 / CTC-LABINF"],"selected":1}],"agrupar":1,"selected":1},{"codigo":"INE5433","nome":"Trabalho de Conclusão de Curso I (TCC) *CIÊNCIAS DA COMPUTAÇÃO","cor":"lightgoldenrodyellow","campus":"FLO","semestre":"20191","turmas":[{"nome":"07208","horas_aula":108,"vagas_ofertadas":40,"vagas_ocupadas":0,"alunos_especiais":0,"saldo_vagas":40,"pedidos_sem_vaga":0,"professores":["Renato Cislaghi"],"horarios":[],"selected":1}],"agrupar":1,"selected":1},{"codigo":"INE5431","nome":"Sistemas Multimídia *CIÊNCIAS DA COMPUTAÇÃO","cor":"lightblue","campus":"FLO","semestre":"20191","turmas":[{"nome":"07208","horas_aula":72,"vagas_ofertadas":35,"vagas_ocupadas":0,"alunos_especiais":0,"saldo_vagas":35,"pedidos_sem_vaga":0,"professores":["Roberto Willrich"],"horarios":["3.1330-1 / CTC-CTC303","3.1420-1 / CTC-CTC303","5.1330-1 / CTC-CTC107","5.1420-1 / CTC-CTC107"],"selected":1}],"agrupar":1,"selected":1}],"materia":"INE5431"},{"combinacao":0,"materias":[],"materia":""},{"combinacao":0,"materias":[],"materia":""},{"combinacao":0,"materias":[],"materia":""}],"plano":0};
+        }
+
+        const request = new Request(
+            url,
+            {
+                method: 'PUT',
+                body: JSON.stringify(data),
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
             }
-        };
-        save_request.open("POST", "save2.cgi?q=" + encodeURIComponent(identificador), true);
-        save_request.send(ret);
-        _gaq.push(['_trackEvent', 'state', 'save', identificador])
-        ui_logger.waiting("salvando horário para '" + identificador + "'");
+        );
+        fetch(request)
+            .then(function(response) {
+                if (!response.ok) {
+                    ui_logger.set_text(
+                        'erro ao salvar horário para "' + identifier + '"',
+                        'lightcoral'
+                    );
+                }
+                ui_logger.set_text(
+                    'horário para "' + identifier + '" foi salvo',
+                    'lightgreen'
+                );
+                persistence.write_id(identifier);
+                mudancas = false;
+            });
+
+        _gaq.push(['_trackEvent', 'state', 'save', identifier])
+        ui_logger.waiting("salvando horário para '" + identifier + "'");
     };
+
     ui_updates.cb_update = function() {
         redraw_plano(state.plano);
     };
+
     self.issues = function() {
         state.issues(database, function(issues){
-            var materia = state.plano.materias.get(state.plano.materias.selected);
-            if (materia)
+            let materia = state.plano.materias.get(state.plano.materias.selected);
+            if (materia) {
                 ui_turmas.create(materia);
+            }
             ui_updates.fill(issues);
         }, ui_updates.hide);
     };
-    self.load = function(state_to_load, identificador) {
+
+    self.load = function(state_to_load, identifier) {
         ui_combinacoes.reset();
         ui_materias.reset();
         ui_updates.reset();
@@ -672,12 +731,15 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
         display.reset();
 
         var ret = state.load(state_to_load);
-        if      (ret === -1)
+        if (ret === -1) {
             ui_logger.set_text("houve algum erro ao importar as mat\u00e9rias!", "lightcoral");
-        else if (ret === -2)
+        } else if (ret === -2) {
             ui_logger.set_text("erro ao tentar abrir horário de versão mais recente", "lightcoral");
-        if (ret != 0)
+        }
+
+        if (ret != 0) {
             return -1;
+        }
 
         ui_planos.startup(state);
 
@@ -685,35 +747,44 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
 
         ui_campus.set_campus(state.campus);
         ui_campus.set_semestre(state.semestre);
+
         self.set_db(state.semestre, state.campus, self.issues);
-        if (identificador)
-            persistence.write_id(identificador);
+        if (identifier) {
+            persistence.write_id(identifier);
+        }
 
         return 0;
     };
     self.set_plano = function(plano) {
-        if (!plano)
+        if (!plano) {
             plano = state.planos[state.index];
-        if (!plano)
+        }
+
+        if (!plano) {
             plano = state.planos[0];
+        }
+
         state.set_plano(plano);
 
-        var materias = plano.materias.list();
-        for (var i = 0; i < materias.length; i++)
+        let materias = plano.materias.list();
+        for (let i = 0; i < materias.length; i++) {
             ui_materias.add(materias[i]);
+        }
 
         var materia = plano.materias.get(plano.materias.selected);
+
         if (materia) {
             ui_turmas.create(materia);
             plano.materias.selected = materia.codigo;
         } else {
             plano.materias.selected = "";
         }
+
         update_all(plano.combinacao);
         mudancas = false;
     };
     load_db = function(semestre, campus, callback) {
-        var src = semestre + ".json";
+        var src = semestre + '.json';
         var oldval = combo.input.value;
         var f_timeout;
         var f_finish = 0;
@@ -866,14 +937,14 @@ window.onload = function() {
     a.href = "#";
     a.innerHTML = "Sobre";
     a.onclick = function() {
-        _gaq.push(['_trackEvent', 'sobre', 'show', identificador]);
+        _gaq.push(['_trackEvent', 'sobre', 'show', identifier]);
         ui_sobre_popup.show();
         ui_grayout.show();
         sobre_shown = true;
     };
     ui_sobre_popup.link.appendChild(a);
     ui_sobre_popup.cb_fechar = function() {
-        _gaq.push(['_trackEvent', 'sobre', 'hide', identificador]);
+        _gaq.push(['_trackEvent', 'sobre', 'hide', identifier]);
         ui_grayout.hide();
         ui_sobre_popup.hide();
         sobre_shown = false;
@@ -950,7 +1021,7 @@ window.onload = function() {
         e = e || window.event;
         var str = 'Mudanças feitas não foram salvas'
 
-        if (mudancas && !persistence.write_state(state.save())) {
+        if (mudancas && !persistence.write_state(state.to_json())) {
             // For IE and Firefox prior to version 4
             if (e) { e.returnValue = str; }
             // For Safari
@@ -960,8 +1031,8 @@ window.onload = function() {
 
     ui_planos.startup(state);
 
-    var identificador = persistence.read_id();
-    ui_saver.identificar(identificador);
+    var identifier = persistence.read_id();
+    ui_saver.identificar(identifier);
     var state2 = persistence.read_state();
     var database_ok = false;
     if (state2 && state2 != "") {
@@ -975,15 +1046,15 @@ window.onload = function() {
         }
     }
     if (!database_ok) {
-        if (identificador != null && identificador != "") {
-            ui_saver.cb_load(identificador, function(){ main.set_db(semester_as_str(...default_db, ''), "FLO"); });
+        if (identifier != null && identifier != "") {
+            ui_saver.cb_load(identifier, function(){ main.set_db(semester_as_str(...default_db, ''), "FLO"); });
             database_ok = true;
         }
     }
     if (!database_ok) {
         main.set_db(semester_as_str(...default_db, ''), "FLO");
     }
-    if (combo.input.value == identificador)
+    if (combo.input.value == identifier)
         combo.input.value = "";
 
     document.getElementById("versao").innerHTML = versao_capim;

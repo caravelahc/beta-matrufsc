@@ -1,38 +1,61 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: utf8 -*-
 
-import time, os
+import capim
 import datetime
+import os
+import time
 import traceback
 
-logs_prefix = '$BASE_PATH/logs/'
+LOGS_PREFIX = '$BASE_PATH/logs/'
+
+
+RESPONSE_404_BODY = '''
+<!DOCTYPE html>
+<html>
+<head>
+    <title>404</title>
+</head>
+<body>
+    <center>404 - Arquivo não encontrado</center>
+</body>
+</html>
+'''
+
 
 def capim_mtime():
     return time.ctime(os.path.getmtime('capim.py'))
 
-import capim
+
 last_mtime = capim_mtime()
+
 
 def dispatch(environ, start_response):
     global last_mtime
     new_mtime = capim_mtime()
+
     if last_mtime != new_mtime:
-        reload(capim)
+        reload(capim)  # Who the fuck commited a non-existent function call?
         last_mtime = new_mtime
+
     try:
         return capim.run(environ, start_response)
-    except:
+    except IOError:
         now = datetime.datetime.now()
-        fp = open(logs_prefix + str(now.year) + '_' + str(now.month) + '_' + str(now.day) + '.log', 'a')
-        fp.write('============================================================\n')
-        fp.write(str(now))
-        fp.write('\n')
-        fp.write(str(environ))
-        fp.write('\n')
-        traceback.print_exc(file=fp)
-        fp.close()
-        start_response('404 Not Found', [('Content-Type', 'text/html; charset=UTF-8')])
-        return ['<html><head><title>404</title></head><body><center>404 - Arquivo não encontrado</center></body></html>']
+        filename = f'{LOGS_PREFIX}{now.year}_{now.month}_{now.day}.log'
+        with open(filename, 'a') as fp:
+            fp.write(
+                f'{"="*60}\n'
+                f'{now}\n'
+                f'{environ}\n'
+            )
+            traceback.print_exc(file=fp)
+        start_response(
+            '404 Not Found',
+            [('Content-Type', 'text/html; charset=UTF-8')]
+        )
+        return [RESPONSE_404_BODY]
+
 
 if __name__ == '__main__':
     ext = __file__.split('.')[-1]

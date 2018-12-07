@@ -2,24 +2,24 @@
 # -*- coding: utf8 -*-
 
 import gzip
-from email.utils import formatdate
-from email.utils import parsedate
 import calendar
 import os
+from email.utils import formatdate
+from email.utils import parsedate
 
 import ods
 
 arquivos = {'index.html': {'content_type': 'text/html'},
             'capim.js': {'content_type': 'application/javascript'},
             'capim.css': {'content_type': 'text/css'},
-            '201a1.json': {'content_type': 'application/json'},
+            '20121.json': {'content_type': 'application/json'},
             '20122.json': {'content_type': 'application/json'},
             '20131.json': {'content_type': 'application/json'},
             '20132.json': {'content_type': 'application/json'},
             '20141.json': {'content_type': 'application/json'},
             }
 
-dados_prefix = '$BASE_PATH/data/'
+DATA_PREFIX = '$BASE_PATH/data/'
 
 
 # based on urlparse.py:parse_qs
@@ -58,15 +58,19 @@ def run(environ, start_response):
 
         if 'uncompressed_length' not in arquivo:
             fname = path0
-            fp = open(fname, 'rb')
-            arquivo['uncompressed_data'] = fp.read()
-            fp.close()
+            with open(fname, 'rb') as fp:
+                arquivo['uncompressed_data'] = fp.read()
             arquivo['uncompressed_length'] = str(os.path.getsize(fname))
             arquivo['last_modified_time'] = os.path.getmtime(fname)
-            arquivo['last_modified_str'] = formatdate(arquivo['last_modified_time'], False, True)
+            arquivo['last_modified_str'] = (
+                formatdate(arquivo['last_modified_time'], False, True)
+            )
 
         try:
-            since_time = calendar.timegm(parsedate(environ['HTTP_IF_MODIFIED_SINCE']))
+            since_time = calendar.timegm(
+                parsedate(environ['HTTP_IF_MODIFIED_SINCE'])
+            )
+
             if arquivo['last_modified_time'] <= since_time:
                 start_response('304 Not Modified', [])
                 return ['']
@@ -89,11 +93,12 @@ def run(environ, start_response):
             content = arquivo['compressed_data']
             content_encoding = 'gzip'
 
-        headers = [('Content-Type', arquivo['content_type']),
-                   ('Last-Modified', arquivo['last_modified_str']),
-                   ('X-Uncompressed-Content-Length', arquivo['uncompressed_length']),
-                   ('Content-Length', content_length),
-                   ]
+        headers = [
+            ('Content-Type', arquivo['content_type']),
+            ('Last-Modified', arquivo['last_modified_str']),
+            ('X-Uncompressed-Content-Length', arquivo['uncompressed_length']),
+            ('Content-Length', content_length),
+        ]
 
         if content_encoding is not None:
             headers.append(('Content-Encoding', content_encoding))
@@ -109,10 +114,10 @@ def run(environ, start_response):
             # os arquivos estão em gzip. se gzip for pedido, o arquivo é
             # aberto normalmente e não é decodificado
             if use_gzip:
-                fp = open(dados_prefix + fname + '.gz', 'rb')
+                fp = open(DATA_PREFIX + fname + '.gz', 'rb')
                 headers.append(('Content-Encoding', 'gzip'))
             else:
-                fp = gzip.open(dados_prefix + fname + '.gz', 'rb')
+                fp = gzip.open(DATA_PREFIX + fname + '.gz', 'rb')
             data = fp.read()
             fp.close()
         except IOError:
@@ -124,13 +129,17 @@ def run(environ, start_response):
     elif path0 == 'save2.cgi':
         fname = encoded_fname(environ)
         data = environ['wsgi.input'].read()
-        fp = gzip.open(dados_prefix + fname + '.gz', 'wb')
-        fp.write(data)
-        fp.close()
-        start_response('200 OK', [('Content-Type', 'text/html'), ('Expires', '-1')])
+        with gzip.open(DATA_PREFIX + fname + '.gz', 'wb') as fp:
+            fp.write(data)
+        start_response(
+            '200 OK',
+            [('Content-Type', 'text/html'), ('Expires', '-1')]
+        )
         return ['OK']
     elif path0 == 'ping.cgi':
-        content_disposition = 'attachment; filename=' + get_q(environ['QUERY_STRING'])
+        content_disposition = (
+            f'attachment; filename={get_q(environ["QUERY_STRING"])}'
+        )
         wsgi_input = environ['wsgi.input'].read().split('\r\n')
         terminator = wsgi_input[0] + '--'
         data = []
@@ -143,10 +152,17 @@ def run(environ, start_response):
             if line == '':
                 started = True
         data = '\r\n'.join(data)
-        start_response('200 OK', [('Content-Type', 'application/octet-stream'), ('Content-Disposition', content_disposition), ('Expires', '-1')])
+        start_response(
+            '200 OK',
+            [('Content-Type', 'application/octet-stream'),
+             ('Content-Disposition', content_disposition),
+             ('Expires', '-1')]
+        )
         return [data]
     elif path0 == 'ods.cgi':
-        content_disposition = 'attachment; filename=' + get_q(environ['QUERY_STRING'])
+        content_disposition = (
+            f'attachment; filename={get_q(environ["QUERY_STRING"])}'
+        )
         wsgi_input = environ['wsgi.input'].read().split('\r\n')
         terminator = wsgi_input[0] + '--'
         data = []
@@ -160,7 +176,12 @@ def run(environ, start_response):
                 started = True
         data = '\r\n'.join(data)
         data = ods.run(data)
-        start_response('200 OK', [('Content-Type', 'application/octet-stream'), ('Content-Disposition', content_disposition), ('Expires', '-1')])
+        start_response(
+            '200 OK',
+            [('Content-Type', 'application/octet-stream'),
+             ('Content-Disposition', content_disposition),
+             ('Expires', '-1')]
+        )
         return [data]
     elif path0 == 'robots.txt':
         start_response('200 OK', [('Content-Type', 'text/plain')])
