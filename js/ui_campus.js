@@ -1,7 +1,12 @@
+function months_to_milliseconds(months) {
+    return months * 1000 * 60 * 60 * 24 * 30;
+}
+
 function current_semester() {
-    let today = new Date();
-    let semester = 1 + Math.floor(today.getMonth() / 6);
-    let year = today.getFullYear();
+    let today = Date.now();
+    let ref_date = new Date(today - months_to_milliseconds(5));
+    let semester = 1 + Math.floor(ref_date.getMonth() / 6);
+    let year = ref_date.getFullYear();
 
     return [year, semester];
 }
