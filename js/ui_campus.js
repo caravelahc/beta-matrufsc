@@ -14,7 +14,7 @@ function current_display_semester() {
     let today = new Date(Date.now());
 
     let semester = 1 + Math.floor(today.getMonth() / 6);
-    if (today.getMonth() in semester_end_months) {
+    if (semester_end_months.includes(today.getMonth())) {
         semester += 1;
     }
 
