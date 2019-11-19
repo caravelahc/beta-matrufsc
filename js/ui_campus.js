@@ -2,17 +2,29 @@ function months_to_milliseconds(months) {
     return months * 1000 * 60 * 60 * 24 * 30;
 }
 
-function current_semester() {
-    let today = Date.now();
-    let ref_date = new Date(today - months_to_milliseconds(5));
-    let semester = 1 + Math.floor(ref_date.getMonth() / 6);
-    let year = ref_date.getFullYear();
+/**
+ * Returns appropriate [year, semester] to be displayed as default in semester
+ * selection.
+ *
+ * Semester starts at 1.
+ */
+function current_display_semester() {
+    const semester_end_months = [5, 10, 11];
+
+    let today = new Date(Date.now());
+
+    let semester = 1 + Math.floor(today.getMonth() / 6);
+    if (today.getMonth() in semester_end_months) {
+        semester += 1;
+    }
+
+    let year = today.getFullYear();
 
     return [year, semester];
 }
 
 function next_semester() {
-    let [year, semester] = current_semester();
+    let [year, semester] = current_display_semester();
 
     semester++;
     if (semester == 3) {
