@@ -24,10 +24,18 @@ function UI_saver(id)
     self.button_load = createButton("abrir");
     ui_saver.appendChild(self.button_load);
     ui_saver.appendChild(document.createTextNode(" "));
+    self.button_load.onclick = () => {
+        self.cb_load(self.input.value);
+        return false;
+    };
 
     self.button_save = createButton("salvar");
     ui_saver.appendChild(self.button_save);
     ui_saver.appendChild(document.createTextNode(" "));
+    self.button_save.onclick = () => {
+        self.cb_save(self.input.value);
+        return false;
+    };
 
     var form = document.createElement("form");
     form.style.display = "none";
@@ -63,8 +71,7 @@ function UI_saver(id)
         self.button_load.style.border = "solid 1px black";
         self.button_save.disabled = true;
         self.button_load.disabled = true;
-        self.button_save.onclick = () => false;
-        self.button_load.onclick = () => false;
+
         self.button_save.style.opacity = ".6";
         self.button_save.style.filter = "alpha(opacity=60)";
         self.button_load.style.opacity = ".6";
@@ -80,15 +87,6 @@ function UI_saver(id)
         self.button_load.style.backgroundColor = "lightblue";
         self.button_save.disabled = false;
         self.button_load.disabled = false;
-
-        self.button_save.onclick = () => {
-            self.cb_save(self.input.value);
-            return false;
-        };
-        self.button_load.onclick = () => {
-            self.cb_load(self.input.value);
-            return false;
-        };
 
         self.button_save.style.opacity = "";
         self.button_save.style.filter = "";
