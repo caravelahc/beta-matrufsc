@@ -64,36 +64,43 @@ function UI_saver(id)
 
     self.enabled = true;
     self.disable = () => {
-        if (!self.enabled) return;
-        self.button_save.style.backgroundColor = "lightgrey";
-        self.button_load.style.backgroundColor = "lightgrey";
-        self.button_save.style.border = "solid 1px black";
-        self.button_load.style.border = "solid 1px black";
-        self.button_save.disabled = true;
-        self.button_load.disabled = true;
+        if (!self.enabled) {
+            return;
+        }
 
-        self.button_save.style.opacity = ".6";
-        self.button_save.style.filter = "alpha(opacity=60)";
-        self.button_load.style.opacity = ".6";
-        self.button_load.style.filter = "alpha(opacity=60)";
-        self.button_save.title = "escolha um identificador primeiro";
-        self.button_load.title = "escolha um identificador primeiro";
+        const disable_button = (button) => {
+            button.style.backgroundColor = "lightgrey";
+            button.style.border = "solid 1px black";
+            button.disabled = true;
+
+            button.style.opacity = ".6";
+            button.style.filter = "alpha(opacity=60)";
+            button.title = "escolha um identificador primeiro";
+        }
+
+        disable_button(self.button_load);
+        disable_button(self.button_save);
+
         self.enabled = false;
     }
 
     self.enable = function() {
-        if (self.enabled) return;
-        self.button_save.style.backgroundColor = "lightblue";
-        self.button_load.style.backgroundColor = "lightblue";
-        self.button_save.disabled = false;
-        self.button_load.disabled = false;
+        if (self.enabled) {
+            return;
+        }
 
-        self.button_save.style.opacity = "";
-        self.button_save.style.filter = "";
-        self.button_load.style.opacity = "";
-        self.button_load.style.filter = "";
-        self.button_save.title = "salvar horário";
-        self.button_load.title = "abrir horário";
+        const enable_button = (button, title) => {
+            button.style.backgroundColor = "lightblue";
+            button.disabled = false;
+
+            button.style.opacity = "";
+            button.style.filter = "";
+            button.title = title;
+        }
+
+        enable_button(self.button_load, "abrir horário");
+        enable_button(self.button_save, "salvar horário");
+
         self.enabled = true;
     }
 
