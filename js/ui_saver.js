@@ -1,3 +1,10 @@
+function createButton(text) {
+    let button = document.createElement("button");
+    button.innerHTML = text;
+    button.onselectstart = () => false;
+    return button;
+}
+
 /**
  * @constructor
  */
@@ -13,18 +20,22 @@ function UI_saver(id)
     input.title = "Escolha um identificador qualquer para salvar/abrir seus horários. O identificador pode ser qualquer coisa (por exemplo seu número de matrícula). Cuidado: qualquer um pode usar qualquer identificador.";
     ui_saver.appendChild(input);
     ui_saver.appendChild(document.createTextNode(" "));
-    var button = document.createElement("span");
-    button.innerHTML = "abrir";
-    button.onselectstart = function () { return false; };
-    ui_saver.appendChild(button);
-    self.button_load = button;
+
+    self.button_load = createButton("abrir");
+    ui_saver.appendChild(self.button_load);
     ui_saver.appendChild(document.createTextNode(" "));
-    var button = document.createElement("span");
-    button.innerHTML = "salvar";
-    button.onselectstart = function () { return false; };
-    ui_saver.appendChild(button);
-    self.button_save = button;
+    self.button_load.onclick = () => {
+        self.cb_load(self.input.value);
+        return false;
+    };
+
+    self.button_save = createButton("salvar");
+    ui_saver.appendChild(self.button_save);
     ui_saver.appendChild(document.createTextNode(" "));
+    self.button_save.onclick = () => {
+        self.cb_save(self.input.value);
+        return false;
+    };
 
     var form = document.createElement("form");
     form.style.display = "none";
@@ -52,34 +63,47 @@ function UI_saver(id)
     dropdown_menu.add("importar arquivo JSON", function(e) { self.cb_upload(); _gaq.push(['_trackEvent', 'state', 'upload', self.input.value]); });
 
     self.enabled = true;
-    self.disable = function() {
-        if (!self.enabled) return;
-        self.button_save.style.backgroundColor = "lightgrey";
-        self.button_load.style.backgroundColor = "lightgrey";
-        self.button_save.onclick = function () { return false; };
-        self.button_load.onclick = function () { return false; };
-        self.button_save.style.opacity = ".6";
-        self.button_save.style.filter = "alpha(opacity=60)";
-        self.button_load.style.opacity = ".6";
-        self.button_load.style.filter = "alpha(opacity=60)";
-        self.button_save.title = "escolha um identificador primeiro";
-        self.button_load.title = "escolha um identificador primeiro";
+    self.disable = () => {
+        if (!self.enabled) {
+            return;
+        }
+
+        const disable_button = (button) => {
+            button.style.backgroundColor = "lightgrey";
+            button.style.border = "solid 1px black";
+            button.disabled = true;
+
+            button.style.opacity = ".6";
+            button.style.filter = "alpha(opacity=60)";
+            button.title = "escolha um identificador primeiro";
+        }
+
+        disable_button(self.button_load);
+        disable_button(self.button_save);
+
         self.enabled = false;
     }
+
     self.enable = function() {
-        if (self.enabled) return;
-        self.button_save.style.backgroundColor = "lightblue";
-        self.button_load.style.backgroundColor = "lightblue";
-        self.button_save.onclick = function () { self.cb_save(self.input.value); return false; };
-        self.button_load.onclick = function () { self.cb_load(self.input.value); return false; };
-        self.button_save.style.opacity = "";
-        self.button_save.style.filter = "";
-        self.button_load.style.opacity = "";
-        self.button_load.style.filter = "";
-        self.button_save.title = "salvar horário";
-        self.button_load.title = "abrir horário";
+        if (self.enabled) {
+            return;
+        }
+
+        const enable_button = (button, title) => {
+            button.style.backgroundColor = "lightblue";
+            button.disabled = false;
+
+            button.style.opacity = "";
+            button.style.filter = "";
+            button.title = title;
+        }
+
+        enable_button(self.button_load, "abrir horário");
+        enable_button(self.button_save, "salvar horário");
+
         self.enabled = true;
     }
+
     self.input.onkeyup = function(e) {
         var c = (e) ? e.keyCode : event.keyCode;
         if (this.value.length == 0) {
