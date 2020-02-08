@@ -43,7 +43,7 @@ function State()
         self.index = 0;
         self.plano = self.planos[self.index];
         self.campus = "FLO";
-        self.semestre = semester_as_str(...next_semester(), '');
+        self.semestre = semester_as_str(...current_display_semester(), '');
     }
     self.reset();
 

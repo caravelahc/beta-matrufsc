@@ -1,4 +1,4 @@
-const default_db = next_semester();
+const default_db = current_display_semester();
 /**
  * @constructor
  */
@@ -855,9 +855,9 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
         document.getElementById("data_db").innerHTML = "banco de dados atualizado em " + database.get_date(semestre);
     };
     self.set_db = function(semestre, campus, callback) {
-        let [year, semester] = next_semester();
-        let next = year + '' + semester;
-        if (semestre == next) {
+        let [year, semester] = current_display_semester();
+        let current = year + '' + semester;
+        if (semestre == current) {
             ui_avisos.reset();
         } else {
             let str = semestre.substr(0,4) + "-" + semestre.substr(4,1);

@@ -1,7 +1,3 @@
-function months_to_milliseconds(months) {
-    return months * 1000 * 60 * 60 * 24 * 30;
-}
-
 /**
  * Returns appropriate [year, semester] to be displayed as default in semester
  * selection.
@@ -23,24 +19,12 @@ function current_display_semester() {
     return [year, semester];
 }
 
-function next_semester() {
-    let [year, semester] = current_display_semester();
-
-    semester++;
-    if (semester == 3) {
-        semester = 1;
-        year++;
-    }
-
-    return [year, semester];
-}
-
 function semester_as_str(year, semester, dash) {
     return year + dash + semester;
 }
 
 function load_semesters(max) {
-    let [year, semester] = next_semester();
+    let [year, semester] = current_display_semester();
 
     let semesters = [];
     for (let _ of Array(max).keys()) {
