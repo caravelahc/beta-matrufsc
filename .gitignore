@@ -1,10 +1,7 @@
-#-------------------------------------------------------------------------------
-# Capim-specific
-
+bin
 backend
 data
 frontend
-
 install
 ods.py
 config.mak
@@ -21,10 +18,3 @@ capim.py
 .htaccess
 dispatch.cgi
 dispatch.fcgi
-
-#-------------------------------------------------------------------------------
-# Python
-
-.venv
-*.pyc
-__pycache__

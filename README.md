@@ -170,23 +170,6 @@ para uso no MatrUFSC e colocá-los na pasta do aplicativo instalado no servidor:
 - http://ramiro.arrozcru.org/matrufsc/20141.json
 - http://ramiro.arrozcru.org/matrufsc/20141.json.gz
 
-Closure
--------
-É possível utilizar o Closure Compiler para reduzir o tamanho do Javascript
-final. O Closure só é usado em modo release (habilitado pelo configure).
-- Pegue o programa em https://developers.google.com/closure/compiler/
-- Copie compiler.jar para algum path (como /usr/bin/compiler.jar)
-- Torne o arquivo legível e executável (chmod a+xr /usr/bin/compiler.jar)
-- Crie um script chamado closure no path (como /usr/bin/closure) que rode o compilador:
-```
-#!/bin/sh
-
-/usr/bin/java -jar /usr/bin/compiler.jar $@
-```
-Só é possível utilizar SIMPLE_OPTIMIZATIONS e não ADVANCED_OPTIMIZATIONS
-(provavelmente por causa do código do state que não permite renomear os campos
-aleatoriamente)
-
 Build system
 ============
 Para compilar o CAPIM, é necessário primeiro configurá-lo. Use o script
@@ -214,19 +197,3 @@ $ make install-gz && cp -r install/* install/.htaccess "/<pasta_do_site>/matrufs
 "matrufsc-&lt;versao&gt;" é um symlink para "matrufsc", que vai ser acessado pelo usuário.
 
 Não se esqueça de copiar os arquivos dos bancos de dados pra pasta na qual o sistema está instalado.
-
-Troubleshooting
-===============
-- Dá erro na hora de carregar os bancos de dados.
-
-  Lembre-se de copiá-los a partir do outro repositório, o matrufsc_dbs.
-- Dá erro 404 quando tento salvar/abrir.
-
-  Confere se o .htaccess tá funcionando direito. Olha a seção 1 e vê se o
-  ExecCGI e o AllowOverride estão certo mesmo.
-- Dá erro 500 quando tento abrir qualquer coisa.
-
-  Confere o error.log do apache2. Se for por causa do ods.py, você
-  provavelmente não instalou o odslib. Olha na seção 1 pra ver como fazer. Se
-  você estiver em um ambiente compartilhado, crie um virtualenv próprio para
-  sua instalação de Python (procure no Google como fazer isso).
