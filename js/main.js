@@ -552,7 +552,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
 
         let url = 'load/' + identifier;
 
-        const debug = false;
+        const debug = true;
         if (debug) {
             url = 'http://localhost:5000/matrufsc' + url;
         }
@@ -670,7 +670,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
         let data = state.to_json();
         persistence.write_state(data);
 
-        const debug = false;
+        const debug = true;
         if (debug) {
             url = 'http://localhost:5000/matrufsc' + url;
             data = {"versao":5,"campus":"FLO","semestre":"20191","planos":[{"combinacao":1,"materias":[{"codigo":"INE5429","nome":"Segurança em Computação *CIÊNCIAS DA COMPUTAÇÃO","cor":"lightcoral","campus":"FLO","semestre":"20191","turmas":[{"nome":"07208","horas_aula":72,"vagas_ofertadas":30,"vagas_ocupadas":0,"alunos_especiais":0,"saldo_vagas":30,"pedidos_sem_vaga":0,"professores":["Jean Everson Martina","Ricardo Felipe Custódio"],"horarios":["3.1620-1 / CTC-INE101","3.1710-1 / CTC-INE101","5.1620-1 / CTC-CTC101","5.1710-1 / CTC-CTC101"],"selected":1}],"agrupar":1,"selected":1},{"codigo":"INE5420","nome":"Computação Gráfica *CIÊNCIAS DA COMPUTAÇÃO","cor":"lightcyan","campus":"FLO","semestre":"20191","turmas":[{"nome":"05208","horas_aula":72,"vagas_ofertadas":33,"vagas_ocupadas":0,"alunos_especiais":0,"saldo_vagas":33,"pedidos_sem_vaga":0,"professores":["Aldo Von Wangenheim"],"horarios":["3.0820-1 / CTC-LABINF","3.0910-1 / CTC-LABINF","5.0820-1 / CTC-LABINF","5.0910-1 / CTC-LABINF"],"selected":1}],"agrupar":1,"selected":1},{"codigo":"INE5433","nome":"Trabalho de Conclusão de Curso I (TCC) *CIÊNCIAS DA COMPUTAÇÃO","cor":"lightgoldenrodyellow","campus":"FLO","semestre":"20191","turmas":[{"nome":"07208","horas_aula":108,"vagas_ofertadas":40,"vagas_ocupadas":0,"alunos_especiais":0,"saldo_vagas":40,"pedidos_sem_vaga":0,"professores":["Renato Cislaghi"],"horarios":[],"selected":1}],"agrupar":1,"selected":1},{"codigo":"INE5431","nome":"Sistemas Multimídia *CIÊNCIAS DA COMPUTAÇÃO","cor":"lightblue","campus":"FLO","semestre":"20191","turmas":[{"nome":"07208","horas_aula":72,"vagas_ofertadas":35,"vagas_ocupadas":0,"alunos_especiais":0,"saldo_vagas":35,"pedidos_sem_vaga":0,"professores":["Roberto Willrich"],"horarios":["3.1330-1 / CTC-CTC303","3.1420-1 / CTC-CTC303","5.1330-1 / CTC-CTC107","5.1420-1 / CTC-CTC107"],"selected":1}],"agrupar":1,"selected":1}],"materia":"INE5431"},{"combinacao":0,"materias":[],"materia":""},{"combinacao":0,"materias":[],"materia":""},{"combinacao":0,"materias":[],"materia":""}],"plano":0};

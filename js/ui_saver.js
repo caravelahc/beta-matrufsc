@@ -5,6 +5,12 @@ function createButton(text) {
     return button;
 }
 
+function enroll() {
+    document.getElementById("matricula").value = document.getElementById("enroll_id_input").value;
+    document.getElementById("enroll_form").submit();
+    return false;
+}
+
 /**
  * @constructor
  */
@@ -36,6 +42,18 @@ function UI_saver(id)
         self.cb_save(self.input.value);
         return false;
     };
+
+    const enroll_id_input = document.createElement("input");
+    enroll_id_input.name = "enroll_id_input";
+    enroll_id_input.id = "enroll_id_input";
+    enroll_id_input.placeholder = "digite sua matrícula";
+    enroll_id_input.type = "text";
+    ui_saver.appendChild(enroll_id_input);
+
+    self.button_enroll = createButton("matricular");
+    ui_saver.appendChild(self.button_enroll);
+    ui_saver.appendChild(document.createTextNode(" "));
+    self.button_enroll.onclick = enroll;
 
     var form = document.createElement("form");
     form.style.display = "none";
@@ -78,9 +96,6 @@ function UI_saver(id)
             button.title = "escolha um identificador primeiro";
         }
 
-        disable_button(self.button_load);
-        disable_button(self.button_save);
-
         self.enabled = false;
     }
 
@@ -100,6 +115,7 @@ function UI_saver(id)
 
         enable_button(self.button_load, "abrir horário");
         enable_button(self.button_save, "salvar horário");
+        enable_button(self.button_enroll, "matricular");
 
         self.enabled = true;
     }
