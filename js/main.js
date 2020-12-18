@@ -486,7 +486,6 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
             var input = document.createElement("input");
             input.style.display = "none";
             input.type = "file";
-//            input.multiple = true;
             input.onchange = function(e) {
                 if (!e.target.files[0]) {
                     ui_logger.set_text("nenhum arquivo selecionado", "lightcoral");
@@ -603,12 +602,27 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
         _gaq.push(['_trackEvent', 'state', 'load', identifier])
         ui_logger.waiting('carregando horário para "' + identifier + '"');
     }
-    /* UI_horario */
+    ui_saver.cb_enroll = () => {
+        const courseList = state.plano.materias.list();
+        const nomes = courseList.map(c => c.codigo).join("#")
+        const turmas = courseList.map(c => c.turmas[0].nome).join("#")
+        const useless = "0#".repeat(courseList.length);
+
+        document.getElementById("nomes").value = nomes;
+        document.getElementById("turmas").value = turmas;
+        document.getElementById("aulas").value = useless;
+        document.getElementById("codHorarios").value = useless;
+        document.getElementById("tipos").value = useless;
+        document.getElementById("formatura").value = -1;
+        document.getElementById("matricula").value = document.getElementById("enroll_id_input").value;
+        document.getElementById("enroll_form").submit();
+    }
+
     ui_horario.cb_select = function() {
         display_combinacao(state.plano.combinacoes.current());
         ui_turmas.set_height(ui_horario.height());
     };
-    /* UI_campus */
+
     ui_campus.cb_campus = function(campus) {
         self.set_db(state.semestre, campus);
         state.campus = campus;

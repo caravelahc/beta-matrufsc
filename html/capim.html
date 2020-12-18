@@ -157,18 +157,15 @@
         </noscript>
 
         <form id="enroll_form" action="https://cagr.sistemas.ufsc.br/matricula/pedido" method="POST">
-            <input type="hidden" name="nomes" value="EFC5556#EFC5558#EFC5801#MTM3101#">
-            <input type="hidden" name="turmas" value="1039#1051#1302#01208#">
-            <input type="hidden" name="aulas" value="4#4#4#4#">
-            <input type="hidden" name="codHorarios" value="19+20+34+35#29+30+31+32#4+5+36+37#24+25+72+73#">
-            <input type="hidden" name="tipos" value="E#E#E#M#">
-            <input type="hidden" name="hminMatricula" value="15">
-            <input type="hidden" name="hmaxMatricula" value="30">
-            <input type="hidden" name="formatura" value="20211">
-            <input type="hidden" name="planoAtivo" value="1">
-            <input type="hidden" name="etapa" value="1">
-            <input type="hidden" name="numeroAulas" value="16">
-            <input type="hidden" name="cmd" value="Concluir Pedido">
+            <input type="hidden" id="nomes" name="nomes" value="EFC5556#EFC5558#EFC5801#MTM3101#">
+            <input type="hidden" id="turmas" name="turmas" value="1039#1051#1302#01208#">
+            <input type="hidden" id="aulas" name="aulas" value="0#">
+            <input type="hidden" id="codHorarios" name="codHorarios" value="0#">
+            <input type="hidden" id="tipos" name="tipos" value="0#">
+            <input type="hidden" id="formatura" name="formatura" value="-1">
+            <input type="hidden" id="planoAtivo" name="planoAtivo" value="1">
+            <input type="hidden" id="etapa" name="etapa" value="1">
+            <input type="hidden" id="cmd" name="cmd" value="Concluir Pedido">
             <input type="hidden" id="matricula" name="matricula" value="">
         </form>
     </body>

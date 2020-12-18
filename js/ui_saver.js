@@ -5,12 +5,6 @@ function createButton(text) {
     return button;
 }
 
-function enroll() {
-    document.getElementById("matricula").value = document.getElementById("enroll_id_input").value;
-    document.getElementById("enroll_form").submit();
-    return false;
-}
-
 /**
  * @constructor
  */
@@ -53,7 +47,9 @@ function UI_saver(id)
     self.button_enroll = createButton("matricular");
     ui_saver.appendChild(self.button_enroll);
     ui_saver.appendChild(document.createTextNode(" "));
-    self.button_enroll.onclick = enroll;
+    self.button_enroll.onclick = () => {
+        self.cb_enroll()
+    };
 
     var form = document.createElement("form");
     form.style.display = "none";
@@ -148,4 +144,5 @@ function UI_saver(id)
     self.cb_cleanup = null;
     self.cb_save = null;
     self.cb_load = null;
+    self.cb_enroll = null;
 }
