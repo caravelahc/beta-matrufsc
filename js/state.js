@@ -49,7 +49,7 @@ function State()
 
     self.copy_plano = function(plano) {
         var state_plano = new Object();
-        var list = plano.materias.list();
+        var list = plano.materias.list;
         state_plano.combinacao = plano.combinacoes.current();
         state_plano.materias   = new Array();
         state_plano.materia    = plano.materias.selected
@@ -293,7 +293,7 @@ function State()
 
     self.issues = function(database, callback_yes, callback_no) {
         var issues = [];
-        var materias = self.plano.materias.list();
+        var materias = self.plano.materias.list;
         for (var i = 0; i < materias.length; i++) {
             var m_issues = [];
             m_issues.materia = materias[i];

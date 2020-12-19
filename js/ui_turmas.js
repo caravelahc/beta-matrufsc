@@ -99,7 +99,8 @@ function UI_turmas(id)
             var turma = horario.turmas[j];
             var input = document.createElement("input");
             input.title = "selecionar/deselecionar turma";
-            input.type     = "checkbox";
+            input.type     = "radio";
+            input.name     = "selected_class";
             input.turma    = turma;
             input.onchange = function() {
                 self.cb_changed(this.turma, this.checked);

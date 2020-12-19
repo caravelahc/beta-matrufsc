@@ -11,7 +11,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
     function display_combinacao(cc)
     {
         var horas_aula = 0;
-        var m = state.plano.materias.list();
+        var m = state.plano.materias.list;
         for (var i = 0; i < m.length; i++) {
             var materia = m[i];
             if (materia.selected == -1) {
@@ -170,7 +170,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
     };
     ui_materias.cb_onmoveup    = function(materia) {
         self.m_stop();
-        var m = state.plano.materias.list();
+        var m = state.plano.materias.list;
         for (var i = 0; i < m.length; i++)
             if (m[i] == materia)
                 break;
@@ -187,7 +187,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
     };
     ui_materias.cb_onmovedown  = function(materia) {
         self.m_stop();
-        var m = state.plano.materias.list();
+        var m = state.plano.materias.list;
         for (var i = 0; i < m.length; i++)
             if (m[i] == materia)
                 break;
@@ -334,14 +334,14 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
         }
         if (comb == null)
             var current = state.plano.combinacoes.get_current();
-        state.plano.combinacoes.generate(state.plano.materias.list());
+        state.plano.combinacoes.generate(state.plano.materias.list);
         if (comb == null)
             comb = state.plano.combinacoes.closest(current)
         if (comb < 1 || comb > state.plano.combinacoes.length())
             comb = 1;
         display_combinacao(comb);
         var errmsg = new String();
-        var m = state.plano.materias.list();
+        var m = state.plano.materias.list;
         for (var i = 0; i < m.length; i++) {
             var materia = m[i];
             if (materia.selected == -1) {
@@ -434,6 +434,8 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
         display.out(state.plano.combinacoes.get_current(), turma);
     };
     ui_turmas.cb_changed = function(turma, checked) {
+        const current_course = state.plano.materias.selected;
+        state.plano.materias.find(current_course).chosen_class = turma.nome
         turma.selected = checked ? 1 : 0;
         turma.materia.selected = 1;
     };
@@ -603,9 +605,9 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
         ui_logger.waiting('carregando horário para "' + identifier + '"');
     }
     ui_saver.cb_enroll = () => {
-        const courseList = state.plano.materias.list();
+        const courseList = state.plano.materias.list;
         const nomes = courseList.map(c => c.codigo).join("#")
-        const turmas = courseList.map(c => c.turmas[0].nome).join("#")
+        const turmas = courseList.map(c => c.chosen_class).join("#")
         const useless = "0#".repeat(courseList.length);
 
         document.getElementById("nomes").value = nomes;
@@ -780,7 +782,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
 
         state.set_plano(plano);
 
-        let materias = plano.materias.list();
+        let materias = plano.materias.list;
         for (let i = 0; i < materias.length; i++) {
             ui_materias.add(materias[i]);
         }
@@ -801,7 +803,6 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
         var src = semestre + '.json';
         var oldval = combo.input.value;
         var f_timeout;
-        var f_finish = 0;
         var f_length = 0;
         var f_loaded = 0;
 

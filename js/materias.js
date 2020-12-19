@@ -121,12 +121,12 @@ function Materia(materia) {
     this.nome     = materia.nome;
     this.selected = materia.selected;
     this.turmas   = new Array();
-
     materia.turmas.forEach(function(turma){
         turma = new Turma(turma);
         turma.materia = self;
         self.turmas.push(turma);
     });
+    this.chosen_class = this.turmas[0].nome;
 }
 Materia.prototype.fix_horarios = function() {
     this.horarios = new Object();
@@ -304,15 +304,10 @@ function Materias()
     self.new_turma = new_turma;
     self.update_add_turma = update_add_turma;
     self.remove_turma = remove_turma;
+    self.list = list;
     /* functions */
-    self.get_nome = function(nome) {
-        for (var i in materias) {
-            var materia = materias[i];
-            if (materia.nome == nome)
-                return materia;
-        }
-        return null;
+    self.find = function(codigo) {
+        return this.list.filter(m => m.codigo === codigo)[0];
     };
     self.get = function(codigo) { return materias[codigo]; };
-    self.list = function() { return list; };
 }
