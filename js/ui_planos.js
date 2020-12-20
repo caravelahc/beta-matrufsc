@@ -52,8 +52,6 @@ function UI_planos(id)
         dropdown_menu.opcoes[2].ix = o;
         dropdown_menu.opcoes[2].innerHTML = "Copiar para \"" + self.planos[o].nome + "\"";
         o++; if (i == o) o++;
-        dropdown_menu.opcoes[3].ix = o;
-        dropdown_menu.opcoes[3].innerHTML = "Copiar para \"" + self.planos[o].nome + "\"";
         plano.span.style.backgroundColor = "black";
         plano.span.style.color = "#eeeeee";
         plano.span.onmouseout  = function() { };
