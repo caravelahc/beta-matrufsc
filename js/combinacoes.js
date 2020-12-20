@@ -49,10 +49,7 @@ function Combinacoes()
         for (var i = 0; i < materias.length; i++) {
             var materia = materias[i];
 
-            materia.selected = ((materia.selected != 0) &&
-                                materia.turmas.some(function(turma){
-                                    return turma.selected;
-                                })) ? 1 : 0;
+            materia.selected = 1;
             if (!materia.selected)
                 continue;
 

@@ -81,7 +81,7 @@ function UI_turmas(id)
             mouseover_turma = null;
         }
     };
-    function new_turma(horario) {
+    function new_turma(horario, chosen_class) {
         var row  = document.createElement("tr");
         row.style.backgroundColor = current_materia.cor;
         row.onmouseover = function() {
@@ -110,7 +110,7 @@ function UI_turmas(id)
                 input.onclick = function() { this.blur() };
             }
             data.appendChild(input);
-            input.checked  = turma.selected;
+            input.checked = turma.nome === horario.materia.chosen_class;
         }
         row.appendChild(data);
 
@@ -448,7 +448,8 @@ function UI_turmas(id)
         else
             self.table.style.width = (thiswidth - document.scrollbar_width) + "px";
     };
-    /* callbacks */
+
+
     self.cb_toggle_agrupar= null;
     self.cb_edit_turma   = null;
     self.cb_remove_turma = null;

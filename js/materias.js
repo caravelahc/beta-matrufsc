@@ -40,7 +40,7 @@ function Turma(turma) {
         this.pedidos_sem_vaga = "0";
         this.professores      = new Array();
         this.aulas            = new Array();
-        this.selected         = 1;
+        this.selected         = 0;
         return;
     }
 

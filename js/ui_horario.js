@@ -177,7 +177,7 @@ var Cell = {
     normal: function(  d) {
         return {
             fixed: d.fixed,
-            text: d.horario.materia.codigo + '\n' + d.horario.turma_representante.nome,
+            text: d.horario.materia.codigo + '\n' + d.horario.materia.chosen_class,
             sala: d.sala,
             bgcolor: d.horario.materia.cor,
             color: "black",
