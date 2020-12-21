@@ -500,7 +500,6 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
         ui_logger.reset(true);
         ui_turmas.reset();
         display.reset();
-
         state.reset();
         ui_campus.set_campus(state.campus);
         ui_campus.set_semestre(state.semestre);
@@ -571,20 +570,26 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
         _gaq.push(['_trackEvent', 'state', 'load', identifier])
         ui_logger.waiting('carregando horário para "' + identifier + '"');
     }
-    ui_saver.cb_enroll = () => {
-        const courseList = state.plano.materias.list;
-        const nomes = courseList.map(c => c.codigo).join("#")
-        const turmas = courseList.map(c => c.chosen_class.nome).join("#")
-        const useless = "0#".repeat(courseList.length);
 
-        document.getElementById("nomes").value = nomes;
-        document.getElementById("turmas").value = turmas;
-        document.getElementById("aulas").value = useless;
-        document.getElementById("codHorarios").value = useless;
-        document.getElementById("tipos").value = useless;
-        document.getElementById("formatura").value = -1;
-        document.getElementById("matricula").value = document.getElementById("enroll_id_input").value;
-        document.getElementById("enroll_form").submit();
+    ui_saver.cb_enroll = () => {
+        const x = window.open('https://cagr.sistemas.ufsc.br/matricula/pedido?cmd=mostralogin&tipoUsuario=null');
+        setTimeout(() => {
+            x.close();
+
+            const courseList = state.plano.materias.list;
+            const nomes = courseList.map(c => c.codigo).join("#")
+            const turmas = courseList.map(c => c.chosen_class.nome).join("#")
+            const useless = "0#".repeat(courseList.length);
+
+            document.getElementById("nomes").value = nomes;
+            document.getElementById("turmas").value = turmas;
+            document.getElementById("aulas").value = useless;
+            document.getElementById("codHorarios").value = useless;
+            document.getElementById("tipos").value = useless;
+            document.getElementById("formatura").value = -1;
+            document.getElementById("matricula").value = document.getElementById("enroll_id_input").value;
+            document.getElementById("enroll_form").submit();
+        }, 500);
     }
 
     ui_horario.cb_select = function() {
