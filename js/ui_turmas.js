@@ -81,7 +81,7 @@ function UI_turmas(id)
             mouseover_turma = null;
         }
     };
-    function new_turma(horario, chosen_class) {
+    function new_turma(horario) {
         var row  = document.createElement("tr");
         row.style.backgroundColor = current_materia.cor;
         row.onmouseover = function() {
@@ -110,7 +110,7 @@ function UI_turmas(id)
                 input.onclick = function() { this.blur() };
             }
             data.appendChild(input);
-            input.checked = turma.nome === horario.materia.chosen_class;
+            input.checked = turma.nome === horario.materia.chosen_class.nome;
         }
         row.appendChild(data);
 

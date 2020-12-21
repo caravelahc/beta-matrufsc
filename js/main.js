@@ -59,7 +59,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
                     turma.materia.ui_turma.style.fontWeight = "bold";
                 else
                     turma.materia.ui_turma.style.fontWeight = "";
-                turma.materia.ui_turma.innerHTML = turma.materia.chosen_class;
+                turma.materia.ui_turma.innerHTML = turma.materia.chosen_class.nome;
                 turma.materia.ui_turma.style.textAlign = "left";
                 turma.materia.ui_selected.checked = true;
                 turma.materia.ui_selected.disabled = "";
@@ -435,7 +435,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
     };
     ui_turmas.cb_changed = function(turma, checked) {
         const current_course = state.plano.materias.selected;
-        state.plano.materias.find(current_course).chosen_class = turma.nome
+        state.plano.materias.find(current_course).chosen_class = turma
         turma.selected = checked ? 1 : 0;
         turma.materia.selected = 1;
     };
@@ -607,7 +607,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_combinacoes, ui_horario,
     ui_saver.cb_enroll = () => {
         const courseList = state.plano.materias.list;
         const nomes = courseList.map(c => c.codigo).join("#")
-        const turmas = courseList.map(c => c.chosen_class).join("#")
+        const turmas = courseList.map(c => c.chosen_class.nome).join("#")
         const useless = "0#".repeat(courseList.length);
 
         document.getElementById("nomes").value = nomes;
