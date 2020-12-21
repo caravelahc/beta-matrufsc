@@ -20,7 +20,7 @@ SRC:=json2.js \
      ui_sobre_popup.js \
      ui_avisos.js \
      ui_campus.js \
-     ui_combinacoes.js \
+     ui_creditos.js \
      ui_horario.js \
      ui_logger.js \
      ui_materias.js \

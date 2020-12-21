@@ -34,9 +34,9 @@ function Display(ui_logger, ui_horario)
         map_turma(turma, c, function(c, dia, hora) {
             if (c && c[dia][hora] && c[dia][hora].horario.materia != materia) {
                 ui_logger.set_quick_text("choque de horario", "lightcoral");
-                ui_horario.display_cell(dia, hora, Cell.red(materia.codigo));
+                ui_horario.display_cell(dia, hora, Cell.red(materia));
             } else {
-                ui_horario.display_cell(dia, hora, Cell.black(materia.codigo));
+                ui_horario.display_cell(dia, hora, Cell.grey(materia));
             }
         });
 

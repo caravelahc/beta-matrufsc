@@ -174,7 +174,7 @@ function UI_horario(id)
 }
 
 var Cell = {
-    normal: function(  d) {
+    normal: function(d) {
         return {
             fixed: d.fixed,
             text: d.horario.materia.codigo + '\n' + d.horario.materia.chosen_class.nome,
@@ -183,19 +183,19 @@ var Cell = {
             color: "black",
         };
     },
-    red: function(str) {
+    red: function(materia) {
         return {
             fixed: true,
-            text: str,
+            text: materia.codigo + '\n' + materia.chosen_class.nome,
             bgcolor: "red",
             color: "black",
         };
     },
-    black: function(str) {
+    grey: function(materia) {
         return {
             fixed: false,
-            text: str,
-            bgcolor: "black",
+            text: materia.codigo,
+            bgcolor: "grey",
             color: "white",
         };
     }
