@@ -443,11 +443,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
             identifier = "matrufsc";
         }
         ui_saver.form.action = "ping.cgi?q=" + encodeURIComponent(identifier + ext);
-        if (ext == ".ics") {
-            ui_saver.form_input.value = state.ics();
-        } else {
-            ui_saver.form_input.value = state.to_json();
-        }
+        ui_saver.form_input.value = state.to_json();
         ui_saver.form.submit();
     };
     ui_saver.cb_upload = function() {

@@ -186,7 +186,7 @@ var Cell = {
     red: function(materia) {
         return {
             fixed: true,
-            text: materia.codigo + '\n' + materia.chosen_class.nome,
+            text: materia.codigo,
             bgcolor: "red",
             color: "black",
         };
