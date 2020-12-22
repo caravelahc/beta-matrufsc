@@ -224,36 +224,6 @@ function UI_turmas(id)
         menu_div.style.backgroundColor = current_materia.cor;
         menu.appendChild(menu_div);
 
-        var menu_soessa = document.createElement("div");
-        menu_soessa.innerHTML = "selecionar só<br />essa turma";
-        menu_soessa.title = "seleciona só essa turma";
-        menu_soessa.oldbg = current_materia.cor;
-        menu_soessa.onmouseout  = hover_off;
-        menu_soessa.onmouseover = hover_on;
-        menu_soessa.onselectstart = function () { return false; };
-        menu_soessa.horario = row.turma.horario;
-        menu_soessa.onmouseup = function(e) {
-            var at_least_one_selected = false;
-            for (var i in current_materia.turmas) {
-                var turma = current_materia.turmas[i];
-                if (turma.horario == this.horario && turma.selected) {
-                    at_least_one_selected = true;
-                    break;
-                }
-            }
-            for (var i in current_materia.turmas) {
-                var turma = current_materia.turmas[i];
-                if (turma.horario == this.horario) {
-                    if (!at_least_one_selected)
-                        self.cb_changed(turma, true);
-                } else {
-                    self.cb_changed(turma, false);
-                }
-            }
-            stop_propagation(e);
-            self.cb_updated(current_materia);
-        }
-        menu_div.appendChild(menu_soessa);
         var menu_remover = document.createElement("div");
         menu_remover.innerHTML = "remover turma";
         menu_remover.title = "remover turma";
@@ -312,18 +282,6 @@ function UI_turmas(id)
         var data = document.createElement("td");
 
         var dropdown_menu = new widget_dropdown_menu(data, 130, 5, false);
-        dropdown_menu.add("selecionar tudo", function(e) {
-            for (var i in current_materia.turmas)
-                self.cb_changed(current_materia.turmas[i], true);
-            stop_propagation(e);
-            self.cb_updated(current_materia);
-        });
-        dropdown_menu.add("selecionar nada", function(e) {
-            for (var i in current_materia.turmas)
-                self.cb_changed(current_materia.turmas[i], false);
-            stop_propagation(e);
-            self.cb_updated(current_materia);
-        });
         dropdown_menu.add("adicionar turma", function(e) { self.cb_new_turma(); });
 
         data.style.width = "22px";
@@ -375,25 +333,6 @@ function UI_turmas(id)
         var row  = document.createElement("tr");
         row.style.backgroundColor = "#eeeeee";
         row.onmouseover = mouseout_turma;
-
-        var data = document.createElement("td");
-        var input = document.createElement("input");
-        input.type     = "checkbox";
-        input.onchange = function() { self.cb_toggle_agrupar(); };
-        if (navigator.userAgent.toLowerCase().indexOf("msie") > -1) {
-            input.onclick = function() { this.blur() };
-        }
-        data.appendChild(input);
-        input.checked = materia.agrupar;
-        data.style.width = "22px";
-        row.appendChild(data);
-
-        var data = document.createElement("td");
-        data.colSpan = "3";
-        data.onmouseup = function() { self.cb_toggle_agrupar(); };
-        data.style.fontSize = "13px"
-        data.innerHTML = "agrupar turmas com horários iguais";
-        row.appendChild(data);
 
         self.tbody.appendChild(row);
         insert_before = row;

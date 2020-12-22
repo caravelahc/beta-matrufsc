@@ -15,7 +15,6 @@ function UI_planos(id)
     dropdown_menu.add("Limpar plano atual", function() { self.cb_clean();      });
     dropdown_menu.add("Copiar plano atual", function() { self.cb_dup(this.ix); });
     dropdown_menu.add("Copiar plano atual", function() { self.cb_dup(this.ix); });
-    dropdown_menu.add("Copiar plano atual", function() { self.cb_dup(this.ix); });
 
     function reset() {
         self.planos.forEach(function(plano) {
