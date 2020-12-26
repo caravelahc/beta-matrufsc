@@ -147,10 +147,6 @@ function UI_turmas(id)
                 innerHTML += "&nbsp;&nbsp;&nbsp;";
             innerHTML += ")/" + twochars(turma.vagas_ofertadas);
             div.innerHTML = innerHTML;
-            if (turma.vagas_ocupadas >= turma.vagas_ofertadas || turma.pedidos_sem_vaga)
-                div.style.color = "red";
-            else
-                div.style.color = "green";
             data.appendChild(div);
             if (!row.turma) {
                 row.turma = turma;
