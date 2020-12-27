@@ -1,8 +1,10 @@
-FROM alpine:latest
+FROM python:3-alpine
 
-ENV DEBIAN_FRONTEND=noninteractive
 RUN apk add \
     bash \
     git \
     make \
-    python3
+    python2 \
+    py3-pip \
+    && \
+    pip3 install --upgrade pip setuptools virtualenv

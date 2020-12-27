@@ -1,6 +1,9 @@
 name: "actions"
 on: push
 
+env:
+  CURRENT_SEMESTER: 20202
+
 jobs:
   deploy-gh-pages:
     name: Deploy
@@ -21,7 +24,33 @@ jobs:
           git config user.name caravelabot
           git remote add pages https://caravelabot:${DEPLOY_ACCESS_TOKEN}@github.com/caravelahc/capim.git
           git fetch
-          git checkout gh-pages
+          git checkout -f gh-pages
           git add -u
-          git commit --am -m "Deploy $(git log -n1 --format=format:'%h')" || true
+          git commit -m "Deploy $(git log -n1 --format=format:'%h')" || true
+          git push pages gh-pages -f
+
+  update-db:
+    name: Update database
+    runs-on: ubuntu-latest
+    container:
+      image: caravelahc/matrufsc:latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Generate
+        run: |
+          virtualenv --python=/usr/bin/python2 .venv
+          source .venv/bin/activate
+          pip install bs4
+          cd db/src
+          ./get_turmas.py ${CURRENT_SEMESTER}
+          ./parse_turmas.py ${CURRENT_SEMESTER}_*.xml ${CURRENT_SEMESTER}.json
+          git checkout gh-pages
+          mv *.json ../../data/${CURRENT_SEMESTER}.json
+          git config user.email 53460931+caravelabot@users.noreply.github.com
+          git config user.name caravelabot
+          git remote add pages https://caravelabot:${DEPLOY_ACCESS_TOKEN}@github.com/caravelahc/capim.git
+          git fetch
+          git add -u
+          git commit -m "Update $(${CURRENT_SEMESTER}).json" || true
           git push pages gh-pages -f
