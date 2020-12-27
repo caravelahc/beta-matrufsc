@@ -160,8 +160,8 @@ function Materias()
     var materias = new Object();
     var list = new Array();
 
-    var cores = [ {cor:"#2459F8",taken:0},
-                  {cor:"#3999C3",taken:0},
+    var cores = [ {cor:"#0240f9",taken:0},
+                  {cor:"#2A7291",taken:0},
                   {cor:"#E8D490",taken:0},
                   {cor:"#DA9E1F",taken:0},
                   {cor:"#56CEBC",taken:0},

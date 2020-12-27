@@ -555,7 +555,6 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
                 });
             });
 
-        _gaq.push(['_trackEvent', 'state', 'load', identifier])
         ui_logger.waiting('carregando horário para "' + identifier + '"');
     }
 
@@ -679,7 +678,6 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
                 mudancas = false;
             });
 
-        _gaq.push(['_trackEvent', 'state', 'save', identifier])
         ui_logger.waiting("salvando horário para '" + identifier + "'");
     };
 
@@ -798,8 +796,6 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
         req.open("GET", src, true);
         req.send(null);
 
-        _gaq.push(['_trackEvent', 'db', 'load', semestre])
-
         var f_pontos = 0;
         loading = function() {
             var innerHTML = "carregando ";
@@ -908,14 +904,12 @@ window.onload = function() {
     a.href = "#";
     a.innerHTML = "Sobre";
     a.onclick = function() {
-        _gaq.push(['_trackEvent', 'sobre', 'show', identifier]);
         ui_sobre_popup.show();
         ui_grayout.show();
         sobre_shown = true;
     };
     ui_sobre_popup.link.appendChild(a);
     ui_sobre_popup.cb_fechar = function() {
-        _gaq.push(['_trackEvent', 'sobre', 'hide', identifier]);
         ui_grayout.hide();
         ui_sobre_popup.hide();
         sobre_shown = false;
@@ -997,7 +991,6 @@ window.onload = function() {
 
     document.getElementById("versao").innerHTML = versao_capim;
     document.getElementById("ui_main").style.display = "block";
-    document.getElementById("ui_fb").style.display = "block";
     ui_turmas.set_height(ui_horario.height());
     ui_materias.fix_width();
 }

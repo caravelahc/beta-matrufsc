@@ -68,11 +68,10 @@ function UI_saver(id)
         var really = confirm("Você quer mesmo limpar tudo?");
         if (really) {
             self.cb_cleanup();
-            _gaq.push(['_trackEvent', 'state', 'reset', self.input.value]);
         }
     });
-    dropdown_menu.add("exportar arquivo JSON", function(e) { self.cb_download(".json"); _gaq.push(['_trackEvent', 'state', 'download', self.input.value]); });
-    dropdown_menu.add("importar arquivo JSON", function(e) { self.cb_upload(); _gaq.push(['_trackEvent', 'state', 'upload', self.input.value]); });
+    dropdown_menu.add("exportar arquivo JSON", function(e) { self.cb_download(".json") });
+    dropdown_menu.add("importar arquivo JSON", function(e) { self.cb_upload() });
 
     self.enabled = true;
     self.disable = () => {
