@@ -110,7 +110,7 @@ function UI_turmas(id)
                 input.onclick = function() { this.blur() };
             }
             data.appendChild(input);
-            input.checked = turma.nome === horario.materia.chosen_class.nome;
+            input.checked = turma.nome === horario.materia.chosen_class;
         }
         row.appendChild(data);
 

@@ -11,9 +11,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
     function display_combinacao(cc)
     {
         var horas_aula = 0;
-        var m = state.plano.materias.list;
-        for (var i = 0; i < m.length; i++) {
-            var materia = m[i];
+        for (const materia of state.plano.materias.list) {
             if (materia.selected == -1) {
                 materia.ui_turma.innerHTML = "<strike>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strike>";
                 materia.ui_turma.style.textAlign = "center";
@@ -42,8 +40,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
                 if (!turma)
                     var turma = horario.turma_representante;
                 var horario_selecionado = 0;
-                for (var k in turma.materia.turmas) {
-                    var t = turma.materia.turmas[k];
+                for (const t of turma.materia.turmas) {
                     if (t.selected) {
                         if (horario_selecionado == 0) {
                             horario_selecionado = t.horario;
@@ -59,8 +56,8 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
                     turma.materia.ui_turma.style.fontWeight = "bold";
                 else
                     turma.materia.ui_turma.style.fontWeight = "";
-                turma.materia.ui_turma.innerHTML = turma.materia.chosen_class.nome;
-                turma.materia.ui_turma.style.textAlign = "left";
+
+                turma.materia.ui_turma.innerHTML = turma.materia.chosen_class;
                 turma.materia.ui_selected.checked = true;
                 turma.materia.ui_selected.disabled = "";
                 horas_aula += parseInt(turma.aulas.length);
@@ -114,7 +111,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
             update_all();
         }
     };
-    ui_materias.cb_select      = function(materia, checked) {
+    ui_materias.cb_select = function(materia, checked) {
         self.m_stop();
         materia.selected = checked ? 1 : 0;
         if (materia.selected) {
@@ -402,7 +399,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
     };
     ui_turmas.cb_changed = function(turma, checked) {
         const current_course = state.plano.materias.selected;
-        state.plano.materias.find(current_course).chosen_class = turma
+        state.plano.materias.find(current_course).chosen_class = turma.nome
         turma.selected = checked ? 1 : 0;
         turma.materia.selected = 1;
     };
@@ -574,7 +571,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
 
             const courseList = state.plano.materias.list;
             const nomes = courseList.map(c => c.codigo).join("#")
-            const turmas = courseList.map(c => c.chosen_class.nome).join("#")
+            const turmas = courseList.map(c => c.chosen_class).join("#")
             const useless = "0#".repeat(courseList.length);
 
             document.getElementById("nomes").value = nomes;
@@ -777,10 +774,6 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
         var req = new XMLHttpRequest();
         req.onreadystatechange = function() {
             switch (this.readyState) {
-                case 2:
-                    if (!(navigator.userAgent.toLowerCase().indexOf("msie") > -1))
-                        f_length = parseInt(this.getResponseHeader("X-Uncompressed-Content-Length"));
-                    break;
                 case 4:
                     clearTimeout(f_timeout);
                     f_timeout = null;

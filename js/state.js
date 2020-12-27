@@ -61,6 +61,7 @@ function State()
             state_materia.cor      = materia.cor;
             state_materia.campus   = materia.campus;
             state_materia.semestre = materia.semestre;
+            state_materia.chosen_class = materia.chosen_class;
             state_materia.turmas   = new Array();
             for (var j = 0; j < materia.turmas.length; j++) {
                 var state_turma = new Object();
@@ -152,7 +153,7 @@ function State()
         /* não deveria ser necessário o parseInt aqui mas, por causa de um bug
          * no código, vários horários foram salvos com a combinação como
          * string. */
-        plano.combinacao        = parseInt(plano_to_load.combinacao);
+        plano.combinacao = parseInt(plano_to_load.combinacao);
         for (var i = 0; i < plano_to_load.materias.length; i++) {
             var materia = plano.materias.add_json(plano_to_load.materias[i], self.campus, self.semestre);
             if (!materia)

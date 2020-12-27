@@ -126,7 +126,7 @@ function Materia(materia) {
         turma.materia = self;
         self.turmas.push(turma);
     });
-    this.chosen_class = this.turmas[0];
+    this.chosen_class = this.turmas[0].nome;
 }
 Materia.prototype.fix_horarios = function() {
     this.horarios = new Object();

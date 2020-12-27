@@ -46,21 +46,21 @@ function Combinacoes()
     }
 
     var generate = function(materias) {
-        const chosen_classes = materias.map(m => m.chosen_class);
+        const chosen_classes = materias.filter(m => m.selected);
         const new_combinacoes = [[],[],[],[],[],[]];
         new_combinacoes.horarios_combo = [];
         for (const materia of chosen_classes) {
             if (!materia.selected)
                 continue;
 
-            const horario = materia.horario;
+            const horario = materia.turmas.find(t => t.nome === materia.chosen_class).horario;
             for (const aula of horario.aulas) {
                 new_combinacoes[aula.dia][aula.hora] = {
                     horario,
                     sala: aula.sala
                 };
             }
-            new_combinacoes[materia.materia.codigo] = horario;
+            new_combinacoes[materia.codigo] = horario;
             new_combinacoes.horarios_combo.push(horario);
         }
         combinacoes = [new_combinacoes];
