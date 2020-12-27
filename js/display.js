@@ -18,8 +18,6 @@ function Display(ui_logger, ui_horario)
     }
     function over(c, turma)
     {
-        if ((navigator.userAgent.toLowerCase().indexOf("msie") > -1) && !turma) /* FIXME something wrong with IE when selecting turmas */
-            return;
         var materia = turma.materia;
         var current_turma = c && c[materia.codigo] ? c[materia.codigo].turma_representante : null;
 
@@ -44,8 +42,6 @@ function Display(ui_logger, ui_horario)
     }
     function out(c, turma)
     {
-        if ((navigator.userAgent.toLowerCase().indexOf("msie") > -1) && !turma) /* FIXME something wrong with IE when selecting turmas */
-            return;
         var materia = turma.materia;
         var current_turma = c && c[materia.codigo] ? c[materia.codigo].turma_representante : null;
 

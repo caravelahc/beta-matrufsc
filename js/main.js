@@ -12,14 +12,13 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
     {
         var horas_aula = 0;
         for (const materia of state.plano.materias.list) {
+            materia.ui_turma.style.textAlign = "center";
             if (materia.selected == -1) {
                 materia.ui_turma.innerHTML = "<strike>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strike>";
-                materia.ui_turma.style.textAlign = "center";
                 materia.ui_selected.checked = 0;
                 materia.ui_selected.disabled = "disabled";
             } else if (materia.selected == 0) {
                 materia.ui_turma.innerHTML = "<strike>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strike>";
-                materia.ui_turma.style.textAlign = "center";
                 materia.ui_selected.checked = 0;
                 materia.ui_selected.disabled = "";
             }
@@ -52,10 +51,6 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
                         }
                     }
                 }
-                if (horario_selecionado == 0)
-                    turma.materia.ui_turma.style.fontWeight = "bold";
-                else
-                    turma.materia.ui_turma.style.fontWeight = "";
 
                 turma.materia.ui_turma.innerHTML = turma.materia.chosen_class;
                 turma.materia.ui_selected.checked = true;

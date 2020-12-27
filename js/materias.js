@@ -126,8 +126,12 @@ function Materia(materia) {
         turma.materia = self;
         self.turmas.push(turma);
     });
-    this.chosen_class = this.turmas[0].nome;
+    this.chosen_class = materia.chosen_class;
+    if (this.chosen_class === undefined) {
+        this.chosen_class = materia.turmas[0].nome;
+    }
 }
+
 Materia.prototype.fix_horarios = function() {
     this.horarios = new Object();
     for (var k = 0; k < this.turmas.length; k++) {
