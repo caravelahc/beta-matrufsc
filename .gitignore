@@ -1,5 +1,4 @@
 bin
-!bin/data
 config.mak
 .htaccess
 *.xml

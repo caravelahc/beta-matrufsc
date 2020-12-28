@@ -1,34 +1,12 @@
-name: "actions"
-on: push
+name: "database"
+on:
+  schedule:
+    - cron: '0 4 * * *'
 
 env:
   CURRENT_SEMESTER: 20202
 
 jobs:
-  deploy-gh-pages:
-    name: Deploy
-    runs-on: ubuntu-latest
-    container:
-      image: caravelahc/matrufsc:latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Compile
-        run: |
-          ./configure --base-path=bin
-          SITE_PATH=bin make
-      - name: Deploy
-        run: |
-          cp bin/* .
-          git config user.email 53460931+caravelabot@users.noreply.github.com
-          git config user.name caravelabot
-          git remote add pages https://caravelabot:${DEPLOY_ACCESS_TOKEN}@github.com/caravelahc/capim.git
-          git fetch
-          git checkout -f gh-pages
-          git add -u
-          git commit -m "Deploy $(git log -n1 --format=format:'%h')" || true
-          git push pages gh-pages -f
-
   update-db:
     name: Update database
     runs-on: ubuntu-latest
@@ -45,12 +23,12 @@ jobs:
           cd db/src
           ./get_turmas.py ${CURRENT_SEMESTER}
           ./parse_turmas.py ${CURRENT_SEMESTER}_*.xml ${CURRENT_SEMESTER}.json
+          git fetch
           git checkout gh-pages
-          mv *.json ../../data/${CURRENT_SEMESTER}.json
+          mv ${CURRENT_SEMESTER}.json ../../data/${CURRENT_SEMESTER}.json
           git config user.email 53460931+caravelabot@users.noreply.github.com
           git config user.name caravelabot
           git remote add pages https://caravelabot:${DEPLOY_ACCESS_TOKEN}@github.com/caravelahc/capim.git
-          git fetch
-          git add -u
+          git add -f data/*.json
           git commit -m "Update $(${CURRENT_SEMESTER}).json" || true
           git push pages gh-pages -f
