@@ -2,7 +2,7 @@ include config.mak
 
 default: install
 
-all: capim.js index.html
+all: capim.js
 
 SRC:=json2.js \
      utils.js \
@@ -17,7 +17,6 @@ SRC:=json2.js \
      state.js \
      versao.js \
      widgets.js \
-     ui_sobre_popup.js \
      ui_avisos.js \
      ui_campus.js \
      ui_creditos.js \
@@ -42,9 +41,6 @@ SRC:=$(addprefix js/,$(SRC))
 ifeq ($(RELEASE),1)
 	sed_RELEASE=-e "s/if(0)/if(1)/"
 endif
-
-index.html: html/capim.html html/sobre.html
-	sed -e "/include_sobre/r html/sobre.html" -e "/include_sobre/d" ${sed_RELEASE} html/capim.html | tee $@ > /dev/null
 
 capim.js: $(SRC)
 ifeq ($(RELEASE),1)
@@ -78,5 +74,6 @@ ifndef SITE_PATH
 endif
 	mkdir -p ${SITE_PATH}
 	cp favicon.ico capim.css ${SITE_PATH}/
-	mv capim.js index.html ${SITE_PATH}/
+	mv capim.js ${SITE_PATH}/
+	cp html/capim.html ${SITE_PATH}/index.html
 	cp .htaccess ${SITE_PATH}/
