@@ -1,10 +1,6 @@
 CAPIM
 =====
 
-_**OBS: Este README está bastante desatualizado. Por exemplo, os arquivos JSON não
-vêm mais do repositório do Ramiro, mas sim via um script específico para isso
-no servidor.**_
-
 Introdução
 ==========
 
@@ -83,117 +79,15 @@ impor ao código. Portanto, aqui defino a licença do CAPIM:
 
 Servidor
 ========
-Para rodar o CAPIM, é necessário ter os seguintes programas/pacotes instalados
-no servidor:
-- Apache 2 **ou** Nginx
-- FastCGI
-- Python 2
-- Flup e OSDLib para Python 2
 
-Apache
-------
-No Ubuntu, os comandos são:
-```
-$ sudo apt-get install apache2 libapache2-mod-fcgid python-flup
-$ sudo a2enmod rewrite
+https://github.com/pet-comp-ufsc/moita
 
-$ sudo apt-get install python-pip
-$ sudo pip install odslib
-```
+Build
+=====
 
-Certifique-se que na configuração de seu site no Apache 2 ExecCGI esteja
-habilitado e os arquivos .htaccess também:
+```bash
+./configure --base-path=bin
+SITE_PATH=bin make
 ```
-Options +ExecCGI
-AllowOverride All
-```
-
-Nginx
------
-No Ubuntu e outras distros Debian-based, os pacotes a instalar são:
-```
-$ sudo apt-get install nginx spawn-fcgi python-pip
-$ sudo pip install flup odslib
-```
-
-Usamos o `spawn-fcgi` para criar um processo FastCGI, já que o Nginx não
-permite por padrão. Da pasta que contém `dispatch.fcgi`:
-```
-$ spawn-fcgi -p 9000 -- dispatch.fcgi
-```
-
-O bloco do Nginx deve conter um redirecionamento para a porta local 9000:
-```
-location / {
-  try_files $uri $uri/ /index.html;
-
-  location ~ \.cgi$ {
-    include fastcgi_params;
-    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-    fastcgi_pass 127.0.0.1:9000;
-  }
-}
-```
-Assim podemos ter certeza que o Nginx buscará arquivos quando solicitado, mas
-passará as requisições de scripts para a porta correta. Não é necessário usar a
-porta 9000, mas mantenha o padrão.
-
-Caminhos
---------
-O CAPIM gera arquivos de dados para cada identificador gravado e gera arquivos
-de log para cada erro interno do dispatch.fcgi. O caminho para os dados está em
-capim.py e o caminho para os logs está em dispatch.fcgi. Ambos são substituídos
-pelo Makefile pelo valor configurado por --base-path. Por exemplo, passando
---base-path=$HOME/matrufsc, a estrutura das pastas fica sendo:
-```
-$HOME/matrufsc/dados3
-$HOME/matrufsc/logs
-```
-Estas pastas não devem ser acessíveis pelo usuário que acessa o servidor! Você
-precisa ter certeza que estas pastas podem ser escritas pelo processo do Apache
-ou do Nginx.
-
-Banco de dados
---------------
-O banco de dados é gerado por código em [outro repositório]
-(https://github.com/ramiropolla/matrufsc_dbs.git). Se você não quiser usar o
-repositório git, basta pegar os arquivos já gerados
-para uso no MatrUFSC e colocá-los na pasta do aplicativo instalado no servidor:
-- http://ramiro.arrozcru.org/matrufsc/20121.json
-- http://ramiro.arrozcru.org/matrufsc/20121.json.gz
-- http://ramiro.arrozcru.org/matrufsc/20122.json
-- http://ramiro.arrozcru.org/matrufsc/20122.json.gz
-- http://ramiro.arrozcru.org/matrufsc/20131.json
-- http://ramiro.arrozcru.org/matrufsc/20131.json.gz
-- http://ramiro.arrozcru.org/matrufsc/20132.json
-- http://ramiro.arrozcru.org/matrufsc/20132.json.gz
-- http://ramiro.arrozcru.org/matrufsc/20141.json
-- http://ramiro.arrozcru.org/matrufsc/20141.json.gz
-
-Build system
-============
-Para compilar o CAPIM, é necessário primeiro configurá-lo. Use o script
-configure, passando as seguintes opções:
-
-- --python-bin=&lt;caminho&gt;  caminho do executável do python no servidor
-- --release               habilita otimização, facebook e google analytics
-- --base-path=&lt;caminho&gt;   caminho da pasta principal do capim no servidor onde
-                          serão guardados os horários dos usuários e os logs de
-                          erro, por exemplo: /home/user/matrufsc
-    										  (não deixe estes arquivos expostos pelo servidor)
-- --subdir=&lt;caminho&gt;      subdiretório em que o capim se encontra no site, por
-                          exemplo: example.com/&lt;caminho&gt;
-- --cgi                   usar cgi no lugar de fcgi
-
-Somente a opção --base-path é obrigatória, sendo o resto opcional. Em seguida,
-basta rodar `make`.
-
-O que eu faço para instalar o CAPIM é:
-```
-$ ./configure --base-path=$HOME/matrufsc --subdir=matrufsc
-$ make install-gz && cp -r install/* install/.htaccess "/<pasta_do_site>/matrufsc-<versao>"
-```
-
-"matrufsc-&lt;versao&gt;" é um symlink para "matrufsc", que vai ser acessado pelo usuário.
 
 Não se esqueça de copiar os arquivos dos bancos de dados pra pasta na qual o sistema está instalado.
