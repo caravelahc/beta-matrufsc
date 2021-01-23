@@ -563,19 +563,37 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
         setTimeout(() => {
             x.close();
 
-            const courseList = state.plano.materias.list;
-            const nomes = courseList.map(c => c.codigo).join("#")
-            const turmas = courseList.map(c => c.chosen_class).join("#")
-            const useless = "0#".repeat(courseList.length);
+            function sendEnrollRequest(plan, final) {
+                const courseList = plan.materias.list;
+                const nomes = courseList.map(c => c.codigo).join("#")
+                const turmas = courseList.map(c => c.chosen_class.nome).join("#")
+                const currentPlanIndex = state.planos.indexOf(plan) + 1;
+                const filler = "0#".repeat(courseList.length);
 
-            document.getElementById("nomes").value = nomes;
-            document.getElementById("turmas").value = turmas;
-            document.getElementById("aulas").value = useless;
-            document.getElementById("codHorarios").value = useless;
-            document.getElementById("tipos").value = useless;
-            document.getElementById("formatura").value = -1;
-            document.getElementById("matricula").value = document.getElementById("enroll_id_input").value;
-            document.getElementById("enroll_form").submit();
+                document.getElementById("nomes").value = nomes;
+                document.getElementById("turmas").value = turmas;
+                document.getElementById("aulas").value = filler;
+                document.getElementById("codHorarios").value = filler;
+                document.getElementById("tipos").value = filler;
+                document.getElementById("formatura").value = -1;
+                document.getElementById("matricula").value = document.getElementById("enroll_id_input").value;
+                document.getElementById("planoAtivo").value = currentPlanIndex;
+                if (final) {
+                    document.getElementById("plano").disabled = true;
+                    document.getElementById("copiarPlano").disabled = true;
+                } else {
+                    document.getElementById("plano").value = currentPlanIndex + 1;
+                    document.getElementById("copiarPlano").disabled = false;
+                }
+                document.getElementById("cmd").value = final ? "Concluir Pedido" : "troca";
+                document.getElementById("enroll_form").submit();
+            }
+
+            const activePlans = state.planos.filter(plan => plan.materias.list.length > 0);
+            for (const plan of activePlans) {
+                const final = state.planos.indexOf(plan) === activePlans.length - 1;
+                sendEnrollRequest(plan, final);
+            }
         }, 500);
     }
 
