@@ -14,7 +14,7 @@ function UI_saver(id)
 
     var ui_saver = document.getElementById(id).parentNode;
     ui_saver.className = "ui_saver";
-    ui_saver.appendChild(document.createTextNode("identificador: "));
+    ui_saver.appendChild(document.createTextNode("Número de matrícula:"));
     var input = document.createElement("input");
     self.input = input;
     input.title = "Escolha um identificador qualquer para salvar/abrir seus horários. O identificador pode ser qualquer coisa (por exemplo seu número de matrícula). Cuidado: qualquer um pode usar qualquer identificador.";
@@ -37,10 +37,15 @@ function UI_saver(id)
         return false;
     };
 
+    // TODO: restore save system
+    this.input.style.display = "none";
+    this.button_load.style.display = "none";
+    this.button_save.style.display = "none";
+
     const enroll_id_input = document.createElement("input");
     enroll_id_input.name = "enroll_id_input";
     enroll_id_input.id = "enroll_id_input";
-    enroll_id_input.placeholder = "digite sua matrícula";
+    enroll_id_input.placeholder = "ex: 19100544";
     enroll_id_input.type = "text";
     ui_saver.appendChild(enroll_id_input);
 
