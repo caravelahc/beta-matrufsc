@@ -927,7 +927,6 @@ window.onload = function() {
         if (elm.nodeType == 3) // defeat Safari bug
             elm = elm.parentNode;
         if (sobre_shown && c == 27) {
-            ui_sobre_popup.cb_fechar();
             return;
         }
         if (main.editando) {
