@@ -563,7 +563,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
             function sendEnrollRequest(plan, final) {
                 const courseList = plan.materias.list;
                 const nomes = courseList.map(c => c.codigo).join("#")
-                const turmas = courseList.map(c => c.chosen_class.nome).join("#")
+                const turmas = courseList.map(c => c.chosen_class).join("#")
                 const currentPlanIndex = state.planos.indexOf(plan) + 1;
                 const filler = "0#".repeat(courseList.length);
 
