@@ -16,12 +16,12 @@ jobs:
           SITE_PATH=bin make
       - name: Deploy
         run: |
-          cp bin/* .
           git config user.email 53460931+caravelabot@users.noreply.github.com
           git config user.name caravelabot
           git remote add pages https://caravelabot:${DEPLOY_ACCESS_TOKEN}@github.com/caravelahc/capim.git
           git fetch
           git checkout -f gh-pages
+          cp bin/* .
           git add -u
           git commit -m "Deploy $(git log -n1 --format=format:'%h')" || true
           git push pages gh-pages -f
