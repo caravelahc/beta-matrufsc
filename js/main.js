@@ -834,7 +834,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
         combo.input.disabled = true;
     };
     self.atualizar_data_db = function(semestre) {
-        document.getElementById("data_db").innerHTML = "| Banco de dados atualizado em " + database.get_date(semestre);
+        document.getElementById("data_db").innerHTML = " | Banco de dados atualizado em " + database.get_date(semestre);
     };
     self.set_db = function(semestre, campus, callback) {
         let [year, semester] = current_display_semester();
