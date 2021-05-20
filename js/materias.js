@@ -160,18 +160,22 @@ function Materias()
     var materias = new Object();
     var list = new Array();
 
-    var cores = [ {cor:"#0240f9",taken:0},
-                  {cor:"#2A7291",taken:0},
-                  {cor:"#E8D490",taken:0},
-                  {cor:"#DA9E1F",taken:0},
-                  {cor:"#56CEBC",taken:0},
-                  {cor:"#CDC932",taken:0},
-                  {cor:"#BD563D",taken:0},
-                  {cor:"#CBA880",taken:0},
-                  {cor:"#E5AA1B",taken:0},
-                  {cor:"#C54813",taken:0},
-                  {cor:"#BD600C",taken:0},
-                  {cor:"#045174",taken:0} ];
+    var cores = [
+        {cor: "lightblue",taken:0},
+        {cor:"lightcoral",taken:0},
+        {cor:"lightcyan",taken:0},
+        {cor:"lightgoldenrodyellow",taken:0},
+        {cor:"lightgreen",taken:0},
+        {cor:"lightpink",taken:0},
+        {cor:"lightsalmon",taken:0},
+        {cor:"lightseagreen",taken:0},
+        {cor:"lightskyblue",taken:0},
+        {cor:"lightslategray",taken:0},
+        {cor:"lightsteelblue",taken:0},
+        {cor:"lightyellow",taken:0},
+        {cor: "lightblue",taken:0}
+    ];
+
     function color_taken(cor) {
         for (var i = 0; i < cores.length; i++)
             if (cores[i].cor == cor) {
