@@ -667,21 +667,21 @@ function Combinacoes()
     }
 
     var generate = function(materias) {
-        const chosen_classes = materias.map(m => m.chosen_class);
+        const chosen_classes = materias.filter(m => m.selected);
         const new_combinacoes = [[],[],[],[],[],[]];
         new_combinacoes.horarios_combo = [];
         for (const materia of chosen_classes) {
             if (!materia.selected)
                 continue;
 
-            const horario = materia.horario;
+            const horario = materia.turmas.find(t => t.nome === materia.chosen_class).horario;
             for (const aula of horario.aulas) {
                 new_combinacoes[aula.dia][aula.hora] = {
                     horario,
                     sala: aula.sala
                 };
             }
-            new_combinacoes[materia.materia.codigo] = horario;
+            new_combinacoes[materia.codigo] = horario;
             new_combinacoes.horarios_combo.push(horario);
         }
         combinacoes = [new_combinacoes];
@@ -826,8 +826,12 @@ function Materia(materia) {
         turma.materia = self;
         self.turmas.push(turma);
     });
-    this.chosen_class = this.turmas[0];
+    this.chosen_class = materia.chosen_class;
+    if (this.chosen_class === undefined) {
+        this.chosen_class = materia.turmas[0].nome;
+    }
 }
+
 Materia.prototype.fix_horarios = function() {
     this.horarios = new Object();
     for (var k = 0; k < this.turmas.length; k++) {
@@ -856,19 +860,18 @@ function Materias()
     var materias = new Object();
     var list = new Array();
 
-    var cores = [ {cor:"lightblue",taken:0},
-                  {cor:"lightcoral",taken:0},
-                  {cor:"lightcyan",taken:0},
-                  {cor:"lightgoldenrodyellow",taken:0},
-                  {cor:"lightgreen",taken:0},
-                  {cor:"lightpink",taken:0},
-                  {cor:"lightsalmon",taken:0},
-                  {cor:"lightseagreen",taken:0},
-                  {cor:"lightskyblue",taken:0},
-                  {cor:"lightslategray",taken:0},
-                  {cor:"lightsteelblue",taken:0},
-                  {cor:"lightyellow",taken:0},
-                  {cor:"lightblue",taken:0} ];
+    var cores = [ {cor:"#0240f9",taken:0},
+                  {cor:"#2A7291",taken:0},
+                  {cor:"#E8D490",taken:0},
+                  {cor:"#DA9E1F",taken:0},
+                  {cor:"#56CEBC",taken:0},
+                  {cor:"#CDC932",taken:0},
+                  {cor:"#BD563D",taken:0},
+                  {cor:"#CBA880",taken:0},
+                  {cor:"#E5AA1B",taken:0},
+                  {cor:"#C54813",taken:0},
+                  {cor:"#BD600C",taken:0},
+                  {cor:"#045174",taken:0} ];
     function color_taken(cor) {
         for (var i = 0; i < cores.length; i++)
             if (cores[i].cor == cor) {
@@ -1031,8 +1034,6 @@ function Display(ui_logger, ui_horario)
     }
     function over(c, turma)
     {
-        if ((navigator.userAgent.toLowerCase().indexOf("msie") > -1) && !turma) /* FIXME something wrong with IE when selecting turmas */
-            return;
         var materia = turma.materia;
         var current_turma = c && c[materia.codigo] ? c[materia.codigo].turma_representante : null;
 
@@ -1057,8 +1058,6 @@ function Display(ui_logger, ui_horario)
     }
     function out(c, turma)
     {
-        if ((navigator.userAgent.toLowerCase().indexOf("msie") > -1) && !turma) /* FIXME something wrong with IE when selecting turmas */
-            return;
         var materia = turma.materia;
         var current_turma = c && c[materia.codigo] ? c[materia.codigo].turma_representante : null;
 
@@ -1535,6 +1534,7 @@ function State()
             state_materia.cor      = materia.cor;
             state_materia.campus   = materia.campus;
             state_materia.semestre = materia.semestre;
+            state_materia.chosen_class = materia.chosen_class;
             state_materia.turmas   = new Array();
             for (var j = 0; j < materia.turmas.length; j++) {
                 var state_turma = new Object();
@@ -1568,7 +1568,7 @@ function State()
         data.campus = self.campus;
         data.semestre = self.semestre;
         data.planos = new Array();
-        data.plano  = self.index;
+        data.plano = self.index;
         for (let p = 0; p < self.planos.length; p++) {
             let state_plano = self.copy_plano(self.planos[p]);
             data.planos.push(state_plano);
@@ -1620,94 +1620,13 @@ function State()
         return { horarios: h, turmas: t, index: self.index };
     };
 
-    self.ics = function() {
-        var ics_str = [ "BEGIN:VCALENDAR",
-                        "VERSION:2.0",
-                        "PRODID:-//CAPIM//MatrUFSC " + versao_capim + "//EN",
-                        "BEGIN:VTIMEZONE",
-                        "TZID:America/Sao_Paulo",
-                        "BEGIN:DAYLIGHT",
-                        "TZNAME:BRST",
-                        "TZOFFSETFROM:-0300",
-                        "TZOFFSETTO:-0200",
-                        "DTSTART:19701018T000000",
-                        "RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=3SU",
-                        "END:DAYLIGHT",
-                        "BEGIN:STANDARD",
-                        "TZNAME:BRT",
-                        "TZOFFSETFROM:-0200",
-                        "TZOFFSETTO:-0300",
-                        "DTSTART:19700215T000000",
-                        "RRULE:FREQ=YEARLY;BYMONTH=2;BYDAY=3SU",
-                        "END:STANDARD",
-                        "END:VTIMEZONE" ];
-
-        var c = self.plano.combinacoes.get_current();
-        c.horarios_combo.forEach(function(horario){
-            for (var k in horario.turmas) {
-                if (horario.turmas[k].selected) {
-                    var turma = horario.turmas[k];
-                    break;
-                }
-            }
-            if (!turma)
-                var turma = horario.turma_representante;
-            turma.order_aulas();
-            var i = 0;
-            while (i < turma.aulas.length) {
-                var dia  = turma.aulas[i].dia;
-                var hor0 = turma.aulas[i].hora;
-                var sala = turma.aulas[i].sala;
-                do {
-                    var hor1 = turma.aulas[i++].hora;
-                } while (i < turma.aulas.length &&
-                         turma.aulas[i].dia == dia &&
-                         turma.aulas[i].sala == sala &&
-                         turma.aulas[i].hora == (hor1+1));
-                var dia_str = "" + (17 + dia);
-                hor0 = Horas[hor0]
-                hor1 = parseInt(Horas[hor1]) + 50;
-                if ((hor1 % 100) > 60)
-                    hor1 += 40;
-                hor1 = "" + hor1;
-                if (hor1.length < 4)
-                    hor1 = "0" + hor1;
-                ics_str.push("BEGIN:VEVENT");
-                ics_str.push("SUMMARY:" + turma.materia.nome);
-                ics_str.push("LOCATION:" + sala);
-                var professores_str = "";
-                turma.professores.forEach(function(prof){
-                    if (professores_str != "")
-                        professores_str += "\\n";
-                    professores_str += prof;
-                });
-                ics_str.push("DESCRIPTION:" + professores_str);
-                ics_str.push("UID:" + turma.materia.codigo + turma.nome + i);
-                ics_str.push("RRULE:FREQ=WEEKLY;UNTIL=20140725T220000Z");
-                ics_str.push("EXDATE;VALUE=DATE:20140418");
-                ics_str.push("EXDATE;VALUE=DATE:20140421");
-                ics_str.push("EXDATE;VALUE=DATE:20140501");
-                ics_str.push("EXDATE;VALUE=DATE:20140502");
-                ics_str.push("EXDATE;VALUE=DATE:20140619");
-                ics_str.push("EXDATE;VALUE=DATE:20140620");
-                ics_str.push("DTSTART;TZID=America/Sao_Paulo:201403" + dia_str + "T" + hor0 + "00"); //
-                ics_str.push("DTEND;TZID=America/Sao_Paulo:201403" + dia_str + "T" + hor1 + "00"); //
-                ics_str.push("TRANSP:OPAQUE");
-                ics_str.push("END:VEVENT");
-            }
-        });
-
-        ics_str.push("END:VCALENDAR");
-        return ics_str.join("\r\n");
-    };
-
     self.new_plano = function(plano_to_load, n) {
         var plano = new Plano(n);
         plano.materias.selected = plano_to_load.materia;
         /* não deveria ser necessário o parseInt aqui mas, por causa de um bug
          * no código, vários horários foram salvos com a combinação como
          * string. */
-        plano.combinacao        = parseInt(plano_to_load.combinacao);
+        plano.combinacao = parseInt(plano_to_load.combinacao);
         for (var i = 0; i < plano_to_load.materias.length; i++) {
             var materia = plano.materias.add_json(plano_to_load.materias[i], self.campus, self.semestre);
             if (!materia)
@@ -1883,7 +1802,7 @@ function State()
         }
     };
 }
-versao_capim = "versão 2.5.13"
+versao_capim = "versão 3.0"
 /**
  * @constructor
  */
@@ -1918,44 +1837,6 @@ function widget_dropdown_menu(parent, width, padding, left)
         menu.appendChild(menu_op);
         self.opcoes.push(menu_op);
     };
-}
-/**
- * @constructor
- */
-function UI_grayout(id)
-{
-    var self = this;
-
-    self.grayout = document.getElementById(id);
-    self.grayout.className = "ui_grayout";
-    self.grayout.onclick = function() { self.cb_onclick(); };
-
-    /* procedures */
-    self.hide = function() { self.grayout.style.display = "none"; };
-    self.show = function() { self.grayout.style.display = ""; };
-    self.cb_onclick = null;
-
-    self.hide();
-}
-
-/**
- * @constructor
- */
-function UI_sobre_popup(id)
-{
-    var self = this;
-
-    self.popup = document.getElementById(id);
-    self.popup.className = "ui_sobre_popup";
-
-    self.hide = function() { self.popup.style.display = "none"; };
-    self.show = function() {
-        self.popup.style.display = "";
-        self.popup.style.marginLeft = "-" + (self.popup.offsetWidth /2) + "px";
-    };
-    self.hide();
-
-    document.getElementById("fechar_sobre").onclick = function() { self.cb_fechar(); };
 }
 /**
  * @constructor
@@ -2273,7 +2154,7 @@ var Cell = {
     normal: function(d) {
         return {
             fixed: d.fixed,
-            text: d.horario.materia.codigo + '\n' + d.horario.materia.chosen_class.nome,
+            text: d.horario.materia.codigo + '\n' + d.horario.materia.chosen_class,
             sala: d.sala,
             bgcolor: d.horario.materia.cor,
             color: "black",
@@ -2282,7 +2163,7 @@ var Cell = {
     red: function(materia) {
         return {
             fixed: true,
-            text: materia.codigo + '\n' + materia.chosen_class.nome,
+            text: materia.codigo,
             bgcolor: "red",
             color: "black",
         };
@@ -2656,7 +2537,6 @@ function UI_planos(id)
     dropdown_menu.add("Limpar plano atual", function() { self.cb_clean();      });
     dropdown_menu.add("Copiar plano atual", function() { self.cb_dup(this.ix); });
     dropdown_menu.add("Copiar plano atual", function() { self.cb_dup(this.ix); });
-    dropdown_menu.add("Copiar plano atual", function() { self.cb_dup(this.ix); });
 
     function reset() {
         self.planos.forEach(function(plano) {
@@ -2739,7 +2619,7 @@ function UI_saver(id)
 
     var ui_saver = document.getElementById(id).parentNode;
     ui_saver.className = "ui_saver";
-    ui_saver.appendChild(document.createTextNode("identificador: "));
+    ui_saver.appendChild(document.createTextNode("Número de matrícula:"));
     var input = document.createElement("input");
     self.input = input;
     input.title = "Escolha um identificador qualquer para salvar/abrir seus horários. O identificador pode ser qualquer coisa (por exemplo seu número de matrícula). Cuidado: qualquer um pode usar qualquer identificador.";
@@ -2762,10 +2642,15 @@ function UI_saver(id)
         return false;
     };
 
+    // TODO: restore save system
+    this.input.style.display = "none";
+    this.button_load.style.display = "none";
+    this.button_save.style.display = "none";
+
     const enroll_id_input = document.createElement("input");
     enroll_id_input.name = "enroll_id_input";
     enroll_id_input.id = "enroll_id_input";
-    enroll_id_input.placeholder = "digite sua matrícula";
+    enroll_id_input.placeholder = "ex: 19100544";
     enroll_id_input.type = "text";
     ui_saver.appendChild(enroll_id_input);
 
@@ -2793,28 +2678,15 @@ function UI_saver(id)
         var really = confirm("Você quer mesmo limpar tudo?");
         if (really) {
             self.cb_cleanup();
-            _gaq.push(['_trackEvent', 'state', 'reset', self.input.value]);
         }
     });
-    dropdown_menu.add("exportar arquivo ODS (Excel)", function(e) { self.cb_ods(); _gaq.push(['_trackEvent', 'state', 'ods', self.input.value]); });
-    dropdown_menu.add("exportar arquivo iCalendar", function(e) { self.cb_download(".ics"); _gaq.push(['_trackEvent', 'state', 'icalendar', self.input.value]); });
-    dropdown_menu.add("exportar arquivo JSON", function(e) { self.cb_download(".json"); _gaq.push(['_trackEvent', 'state', 'download', self.input.value]); });
-    dropdown_menu.add("importar arquivo JSON", function(e) { self.cb_upload(); _gaq.push(['_trackEvent', 'state', 'upload', self.input.value]); });
+    dropdown_menu.add("exportar arquivo JSON", function(e) { self.cb_download(".json") });
+    dropdown_menu.add("importar arquivo JSON", function(e) { self.cb_upload() });
 
     self.enabled = true;
     self.disable = () => {
         if (!self.enabled) {
             return;
-        }
-
-        const disable_button = (button) => {
-            button.style.backgroundColor = "lightgrey";
-            button.style.border = "solid 1px black";
-            button.disabled = true;
-
-            button.style.opacity = ".6";
-            button.style.filter = "alpha(opacity=60)";
-            button.title = "escolha um identificador primeiro";
         }
 
         self.enabled = false;
@@ -2983,7 +2855,7 @@ function UI_turmas(id)
                 input.onclick = function() { this.blur() };
             }
             data.appendChild(input);
-            input.checked = turma.nome === horario.materia.chosen_class.nome;
+            input.checked = turma.nome === horario.materia.chosen_class;
         }
         row.appendChild(data);
 
@@ -3020,10 +2892,6 @@ function UI_turmas(id)
                 innerHTML += "&nbsp;&nbsp;&nbsp;";
             innerHTML += ")/" + twochars(turma.vagas_ofertadas);
             div.innerHTML = innerHTML;
-            if (turma.vagas_ocupadas >= turma.vagas_ofertadas || turma.pedidos_sem_vaga)
-                div.style.color = "red";
-            else
-                div.style.color = "green";
             data.appendChild(div);
             if (!row.turma) {
                 row.turma = turma;
@@ -3097,36 +2965,6 @@ function UI_turmas(id)
         menu_div.style.backgroundColor = current_materia.cor;
         menu.appendChild(menu_div);
 
-        var menu_soessa = document.createElement("div");
-        menu_soessa.innerHTML = "selecionar só<br />essa turma";
-        menu_soessa.title = "seleciona só essa turma";
-        menu_soessa.oldbg = current_materia.cor;
-        menu_soessa.onmouseout  = hover_off;
-        menu_soessa.onmouseover = hover_on;
-        menu_soessa.onselectstart = function () { return false; };
-        menu_soessa.horario = row.turma.horario;
-        menu_soessa.onmouseup = function(e) {
-            var at_least_one_selected = false;
-            for (var i in current_materia.turmas) {
-                var turma = current_materia.turmas[i];
-                if (turma.horario == this.horario && turma.selected) {
-                    at_least_one_selected = true;
-                    break;
-                }
-            }
-            for (var i in current_materia.turmas) {
-                var turma = current_materia.turmas[i];
-                if (turma.horario == this.horario) {
-                    if (!at_least_one_selected)
-                        self.cb_changed(turma, true);
-                } else {
-                    self.cb_changed(turma, false);
-                }
-            }
-            stop_propagation(e);
-            self.cb_updated(current_materia);
-        }
-        menu_div.appendChild(menu_soessa);
         var menu_remover = document.createElement("div");
         menu_remover.innerHTML = "remover turma";
         menu_remover.title = "remover turma";
@@ -3185,18 +3023,6 @@ function UI_turmas(id)
         var data = document.createElement("td");
 
         var dropdown_menu = new widget_dropdown_menu(data, 130, 5, false);
-        dropdown_menu.add("selecionar tudo", function(e) {
-            for (var i in current_materia.turmas)
-                self.cb_changed(current_materia.turmas[i], true);
-            stop_propagation(e);
-            self.cb_updated(current_materia);
-        });
-        dropdown_menu.add("selecionar nada", function(e) {
-            for (var i in current_materia.turmas)
-                self.cb_changed(current_materia.turmas[i], false);
-            stop_propagation(e);
-            self.cb_updated(current_materia);
-        });
         dropdown_menu.add("adicionar turma", function(e) { self.cb_new_turma(); });
 
         data.style.width = "22px";
@@ -3248,25 +3074,6 @@ function UI_turmas(id)
         var row  = document.createElement("tr");
         row.style.backgroundColor = "#eeeeee";
         row.onmouseover = mouseout_turma;
-
-        var data = document.createElement("td");
-        var input = document.createElement("input");
-        input.type     = "checkbox";
-        input.onchange = function() { self.cb_toggle_agrupar(); };
-        if (navigator.userAgent.toLowerCase().indexOf("msie") > -1) {
-            input.onclick = function() { this.blur() };
-        }
-        data.appendChild(input);
-        input.checked = materia.agrupar;
-        data.style.width = "22px";
-        row.appendChild(data);
-
-        var data = document.createElement("td");
-        data.colSpan = "3";
-        data.onmouseup = function() { self.cb_toggle_agrupar(); };
-        data.style.fontSize = "13px"
-        data.innerHTML = "agrupar turmas com horários iguais";
-        row.appendChild(data);
 
         self.tbody.appendChild(row);
         insert_before = row;
@@ -3435,7 +3242,7 @@ const default_db = current_display_semester();
  * @constructor
  */
 function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
-              ui_saver, ui_campus, ui_planos, ui_grayout, ui_updates, ui_avisos,
+              ui_saver, ui_campus, ui_planos, ui_updates, ui_avisos,
               combo, state, display, persistence, database)
 {
     var self = this;
@@ -3443,17 +3250,14 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
     function display_combinacao(cc)
     {
         var horas_aula = 0;
-        var m = state.plano.materias.list;
-        for (var i = 0; i < m.length; i++) {
-            var materia = m[i];
+        for (const materia of state.plano.materias.list) {
+            materia.ui_turma.style.textAlign = "center";
             if (materia.selected == -1) {
                 materia.ui_turma.innerHTML = "<strike>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strike>";
-                materia.ui_turma.style.textAlign = "center";
                 materia.ui_selected.checked = 0;
                 materia.ui_selected.disabled = "disabled";
             } else if (materia.selected == 0) {
                 materia.ui_turma.innerHTML = "<strike>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strike>";
-                materia.ui_turma.style.textAlign = "center";
                 materia.ui_selected.checked = 0;
                 materia.ui_selected.disabled = "";
             }
@@ -3474,8 +3278,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
                 if (!turma)
                     var turma = horario.turma_representante;
                 var horario_selecionado = 0;
-                for (var k in turma.materia.turmas) {
-                    var t = turma.materia.turmas[k];
+                for (const t of turma.materia.turmas) {
                     if (t.selected) {
                         if (horario_selecionado == 0) {
                             horario_selecionado = t.horario;
@@ -3487,12 +3290,8 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
                         }
                     }
                 }
-                if (horario_selecionado == 0)
-                    turma.materia.ui_turma.style.fontWeight = "bold";
-                else
-                    turma.materia.ui_turma.style.fontWeight = "";
-                turma.materia.ui_turma.innerHTML = turma.materia.chosen_class.nome;
-                turma.materia.ui_turma.style.textAlign = "left";
+
+                turma.materia.ui_turma.innerHTML = turma.materia.chosen_class;
                 turma.materia.ui_selected.checked = true;
                 turma.materia.ui_selected.disabled = "";
                 horas_aula += parseInt(turma.aulas.length);
@@ -3546,7 +3345,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
             update_all();
         }
     };
-    ui_materias.cb_select      = function(materia, checked) {
+    ui_materias.cb_select = function(materia, checked) {
         self.m_stop();
         materia.selected = checked ? 1 : 0;
         if (materia.selected) {
@@ -3815,7 +3614,6 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
                 overlay[dia][hora] = true;
             onover(dia, hora);
         };
-        ui_grayout.show();
         ui_horario.set_toggle(toggle, onover, onout);
         ui_turmas.edit_start(turma);
         self.editando = turma;
@@ -3834,7 +3632,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
     };
     ui_turmas.cb_changed = function(turma, checked) {
         const current_course = state.plano.materias.selected;
-        state.plano.materias.find(current_course).chosen_class = turma
+        state.plano.materias.find(current_course).chosen_class = turma.nome
         turma.selected = checked ? 1 : 0;
         turma.materia.selected = 1;
     };
@@ -3848,11 +3646,9 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
     };
 
     ui_turmas.cb_ok = function() {
-        ui_grayout.hide();
         update_all();
     };
     ui_turmas.cb_cancel = function() {
-        ui_grayout.hide();
         clear_overlay();
         ui_horario.set_toggle(null);
         ui_turmas.edit_end();
@@ -3875,11 +3671,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
             identifier = "matrufsc";
         }
         ui_saver.form.action = "ping.cgi?q=" + encodeURIComponent(identifier + ext);
-        if (ext == ".ics") {
-            ui_saver.form_input.value = state.ics();
-        } else {
-            ui_saver.form_input.value = state.to_json();
-        }
+        ui_saver.form_input.value = state.to_json();
         ui_saver.form.submit();
     };
     ui_saver.cb_upload = function() {
@@ -3999,7 +3791,6 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
                 });
             });
 
-        _gaq.push(['_trackEvent', 'state', 'load', identifier])
         ui_logger.waiting('carregando horário para "' + identifier + '"');
     }
 
@@ -4008,19 +3799,37 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
         setTimeout(() => {
             x.close();
 
-            const courseList = state.plano.materias.list;
-        const nomes = courseList.map(c => c.codigo).join("#")
-        const turmas = courseList.map(c => c.chosen_class.nome).join("#")
-        const useless = "0#".repeat(courseList.length);
+            function sendEnrollRequest(plan, final) {
+                const courseList = plan.materias.list;
+                const nomes = courseList.map(c => c.codigo).join("#")
+                const turmas = courseList.map(c => c.chosen_class.nome).join("#")
+                const currentPlanIndex = state.planos.indexOf(plan) + 1;
+                const filler = "0#".repeat(courseList.length);
 
-        document.getElementById("nomes").value = nomes;
-        document.getElementById("turmas").value = turmas;
-        document.getElementById("aulas").value = useless;
-        document.getElementById("codHorarios").value = useless;
-        document.getElementById("tipos").value = useless;
-        document.getElementById("formatura").value = -1;
-        document.getElementById("matricula").value = document.getElementById("enroll_id_input").value;
-        document.getElementById("enroll_form").submit();
+                document.getElementById("nomes").value = nomes;
+                document.getElementById("turmas").value = turmas;
+                document.getElementById("aulas").value = filler;
+                document.getElementById("codHorarios").value = filler;
+                document.getElementById("tipos").value = filler;
+                document.getElementById("formatura").value = -1;
+                document.getElementById("matricula").value = document.getElementById("enroll_id_input").value;
+                document.getElementById("planoAtivo").value = currentPlanIndex;
+                if (final) {
+                    document.getElementById("plano").disabled = true;
+                    document.getElementById("copiarPlano").disabled = true;
+                } else {
+                    document.getElementById("plano").value = currentPlanIndex + 1;
+                    document.getElementById("copiarPlano").disabled = false;
+                }
+                document.getElementById("cmd").value = final ? "Concluir Pedido" : "troca";
+                document.getElementById("enroll_form").submit();
+            }
+
+            const activePlans = state.planos.filter(plan => plan.materias.list.length > 0);
+            for (const plan of activePlans) {
+                const final = state.planos.indexOf(plan) === activePlans.length - 1;
+                sendEnrollRequest(plan, final);
+            }
         }, 500);
     }
 
@@ -4123,7 +3932,6 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
                 mudancas = false;
             });
 
-        _gaq.push(['_trackEvent', 'state', 'save', identifier])
         ui_logger.waiting("salvando horário para '" + identifier + "'");
     };
 
@@ -4213,10 +4021,6 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
         var req = new XMLHttpRequest();
         req.onreadystatechange = function() {
             switch (this.readyState) {
-                case 2:
-                    if (!(navigator.userAgent.toLowerCase().indexOf("msie") > -1))
-                        f_length = parseInt(this.getResponseHeader("X-Uncompressed-Content-Length"));
-                    break;
                 case 4:
                     clearTimeout(f_timeout);
                     f_timeout = null;
@@ -4246,8 +4050,6 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
         req.open("GET", src, true);
         req.send(null);
 
-        _gaq.push(['_trackEvent', 'db', 'load', semestre])
-
         var f_pontos = 0;
         loading = function() {
             var innerHTML = "carregando ";
@@ -4271,7 +4073,7 @@ function Main(ui_materias, ui_turmas, ui_logger, ui_creditos, ui_horario,
         combo.input.disabled = true;
     };
     self.atualizar_data_db = function(semestre) {
-        document.getElementById("data_db").innerHTML = "banco de dados atualizado em " + database.get_date(semestre);
+        document.getElementById("data_db").innerHTML = "| Banco de dados atualizado em " + database.get_date(semestre);
     };
     self.set_db = function(semestre, campus, callback) {
         let [year, semester] = current_display_semester();
@@ -4342,40 +4144,13 @@ window.onload = function() {
     var ui_updates     = new UI_updates("updates_list");
     var ui_avisos      = new UI_avisos("avisos");
 
-    var ui_grayout     = new UI_grayout("grayout");
-    ui_grayout.cb_onclick = function() {
-        if (sobre_shown) {
-            ui_sobre_popup.cb_fechar();
-        } else if (main.editando) {
-            ui_turmas.cb_cancel();
-        }
-    };
-    var ui_sobre_popup = new UI_sobre_popup("sobre_popup");
-    ui_sobre_popup.link = document.getElementById("sobre");
-    var a = document.createElement("a");
-    a.href = "#";
-    a.innerHTML = "Sobre";
-    a.onclick = function() {
-        _gaq.push(['_trackEvent', 'sobre', 'show', identifier]);
-        ui_sobre_popup.show();
-        ui_grayout.show();
-        sobre_shown = true;
-    };
-    ui_sobre_popup.link.appendChild(a);
-    ui_sobre_popup.cb_fechar = function() {
-        _gaq.push(['_trackEvent', 'sobre', 'hide', identifier]);
-        ui_grayout.hide();
-        ui_sobre_popup.hide();
-        sobre_shown = false;
-    }
-
     var state = new State();
     var display = new Display(ui_logger, ui_horario);
 
     dconsole2 = new Dconsole("dconsole");
     var combo   = new Combobox("materias_input", "materias_suggestions", ui_logger, database);
     var main   = new Main(ui_materias, ui_turmas, ui_logger, ui_creditos,
-                          ui_horario, ui_saver, ui_campus, ui_planos, ui_grayout,
+                          ui_horario, ui_saver, ui_campus, ui_planos,
                           ui_updates, ui_avisos, combo,
                           state, display, persistence, database);
 
@@ -4445,7 +4220,6 @@ window.onload = function() {
 
     document.getElementById("versao").innerHTML = versao_capim;
     document.getElementById("ui_main").style.display = "block";
-    document.getElementById("ui_fb").style.display = "block";
     ui_turmas.set_height(ui_horario.height());
     ui_materias.fix_width();
 }
