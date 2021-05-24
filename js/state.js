@@ -39,7 +39,7 @@ function State()
     var self = this;
 
     self.reset = function() {
-        self.planos = Array.from(range(0, 3, 1, i => new Plano(i)));
+        self.planos = Array.from(range(0, 1, 1, i => new Plano(i)));
         self.index = 0;
         self.plano = self.planos[self.index];
         self.campus = "FLO";

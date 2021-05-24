@@ -13,8 +13,9 @@ function UI_planos(id)
 
     var dropdown_menu = new widget_dropdown_menu(ui_planos, 180, 2, false);
     dropdown_menu.add("Limpar plano atual", function() { self.cb_clean();      });
-    dropdown_menu.add("Copiar plano atual", function() { self.cb_dup(this.ix); });
-    dropdown_menu.add("Copiar plano atual", function() { self.cb_dup(this.ix); });
+    // 
+    // dropdown_menu.add("Copiar plano atual", function() { self.cb_dup(this.ix); });
+    // dropdown_menu.add("Copiar plano atual", function() { self.cb_dup(this.ix); });
 
     function reset() {
         self.planos.forEach(function(plano) {
@@ -44,13 +45,15 @@ function UI_planos(id)
                 break;
             }
         dropdown_menu.opcoes[0].innerHTML = "Limpar \"" + plano.nome + "\"";
-        if (i == o) o++;
-        dropdown_menu.opcoes[1].ix = o;
-        dropdown_menu.opcoes[1].innerHTML = "Copiar para \"" + self.planos[o].nome + "\"";
-        o++; if (i == o) o++;
-        dropdown_menu.opcoes[2].ix = o;
-        dropdown_menu.opcoes[2].innerHTML = "Copiar para \"" + self.planos[o].nome + "\"";
-        o++; if (i == o) o++;
+
+        // TODO: Restore when we support more than one plan
+        // if (i == o) o++;
+        // dropdown_menu.opcoes[1].ix = o;
+        // dropdown_menu.opcoes[1].innerHTML = "Copiar para \"" + self.planos[o].nome + "\"";
+        // o++; if (i == o) o++;
+        // dropdown_menu.opcoes[2].ix = o;
+        // dropdown_menu.opcoes[2].innerHTML = "Copiar para \"" + self.planos[o].nome + "\"";
+        // o++; if (i == o) o++;
         plano.span.style.backgroundColor = "black";
         plano.span.style.color = "#eeeeee";
         plano.span.onmouseout  = function() { };
