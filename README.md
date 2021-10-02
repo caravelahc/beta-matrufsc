@@ -1,10 +1,10 @@
 CAPIM
 =====
 
-Fork do MatrUFSC que possibilita a realização de pedidos de matrícula fora da interface do CAGR.
+Fork do MatrUFSC que possibilita a realização de pedidos de matrícula fora da interface do CAGR. Através de uma vulnerabilidade CSRF exposta pelo CAGR é possível emitir a requisição de matrícula (`form`) através de outro site, tal requisição terá sucesso desde que o usuário já esteja logado no sistema universitário.
 
-Site: https://beta.matrufsc.caravela.club | Wiki:
-https://github.com/caravelahc/capim/wiki
+Site: https://beta.matrufsc.caravela.club
+Wiki: https://github.com/caravelahc/capim/wiki
 
 -----
 
