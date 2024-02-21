@@ -5,7 +5,7 @@ on:
     - cron: "0 4 * * *"
 
 env:
-  CURRENT_SEMESTER: 20232
+  CURRENT_SEMESTER: 20241
 
 jobs:
   update-db:
