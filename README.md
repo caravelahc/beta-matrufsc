@@ -7,6 +7,11 @@ Site: https://beta.matrufsc.caravela.club
 
 -----
 
+### Atualizando através do GitHub Actions
+1. Atualize o semestre atual em https://github.com/caravelahc/beta-matrufsc/blob/master/.github/workflows/database.yml
+2. Rode o workflow manualmente em https://github.com/caravelahc/beta-matrufsc/actions/workflows/database.yml
+3. Cheque se o JSON foi adicionado na branch: https://github.com/caravelahc/beta-matrufsc/tree/gh-pages/data
+
 ### Servidor
 
 https://github.com/pet-comp-ufsc/moita
