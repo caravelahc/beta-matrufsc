@@ -3,7 +3,8 @@ CAPIM
 
 Fork do [MatrUFSC](https://github.com/caravelahc/capim) que possibilita a realização de pedidos de matrícula fora da interface do CAGR. Através de uma vulnerabilidade CSRF exposta pelo CAGR é possível emitir a requisição de matrícula (`form`) através de outro site, tal requisição terá sucesso desde que o usuário já esteja logado no sistema universitário.
 
-Site: https://beta.matrufsc.caravela.club
+Site: https://beta.matrufsc.caravela.club<br>
+Explicação de como a vulnerabilidade funciona: https://repositorio.ufsc.br/handle/123456789/243426 ([**PDF**](https://repositorio.ufsc.br/bitstream/handle/123456789/243426/TCC_Artur_Barichello.pdf?sequence=1&isAllowed=y))
 
 -----
 
