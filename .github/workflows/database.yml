@@ -5,31 +5,40 @@ on:
     - cron: "0 4 * * *"
 
 env:
-  CURRENT_SEMESTER: 20261
+  CURRENT_SEMESTER: 20262
 
 jobs:
   update-db:
     name: Update database
     runs-on: ubuntu-latest
-    container:
-      image: caravelahc/matrufsc:latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Generate
         run: |
-          virtualenv --python=/usr/bin/python2 .venv
-          source .venv/bin/activate
-          pip install bs4
-          cd db/src
-          ./get_turmas.py ${CURRENT_SEMESTER}
-          ./parse_turmas.py ${CURRENT_SEMESTER}_*.xml ${CURRENT_SEMESTER}.json
-          git fetch
-          git checkout gh-pages
-          mv ${CURRENT_SEMESTER}.json ../../data/${CURRENT_SEMESTER}.json
+          docker run --rm -v "${PWD}:/work" -w /work/db/src \
+            -e CURRENT_SEMESTER="${CURRENT_SEMESTER}" \
+            caravelahc/matrufsc:latest bash -c '
+              set -e
+              virtualenv --python=/usr/bin/python2 /tmp/venv
+              source /tmp/venv/bin/activate
+              pip install bs4
+              ./get_turmas.py ${CURRENT_SEMESTER}
+              ./parse_turmas.py ${CURRENT_SEMESTER}_*.xml /work/${CURRENT_SEMESTER}.json
+              chmod -R a+rw /work/${CURRENT_SEMESTER}.json /work/db/src
+            '
+          wc -c ${CURRENT_SEMESTER}.json
+      - name: Publish
+        run: |
           git config user.email 53460931+caravelabot@users.noreply.github.com
           git config user.name caravelabot
-          git remote add pages https://caravelabot:${DEPLOY_ACCESS_TOKEN}@github.com/caravelahc/beta-matrufsc.git
-          git add -f ../../data/*.json || true
-          git commit -m "Update $(${CURRENT_SEMESTER}).json" || true
-          git push pages gh-pages -f
+          rm -f db/src/*.xml
+          git checkout gh-pages
+          mv ${CURRENT_SEMESTER}.json data/${CURRENT_SEMESTER}.json
+          git add -f data/${CURRENT_SEMESTER}.json
+          git commit -m "Update ${CURRENT_SEMESTER}.json" || true
+          git push origin gh-pages
